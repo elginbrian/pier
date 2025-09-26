@@ -31,8 +31,14 @@ export default function WhyChooseUs() {
           ].map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div key={idx} className="rounded-lg p-6 shadow-md reveal-from-bottom" style={{ backgroundColor: colors.base[100] }}>
-                <div className="w-12 h-12 rounded-md flex items-center justify-center mb-4" style={{ backgroundColor: colors.secondary[300] }}>
+              <div
+                key={idx}
+                role="button"
+                tabIndex={0}
+                className="group rounded-lg p-6 shadow-md reveal-from-bottom transition-transform duration-300 transform hover:-translate-y-2 hover:scale-105 hover:shadow-xl cursor-pointer"
+                style={{ backgroundColor: colors.base[100] }}
+              >
+                <div className="w-12 h-12 rounded-md flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: colors.secondary[300] }}>
                   <Icon size={20} color="white" aria-hidden />
                 </div>
                 <h4 className="font-semibold mb-2" style={{ color: colors.base[700] }}>
