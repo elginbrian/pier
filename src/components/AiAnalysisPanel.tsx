@@ -34,18 +34,23 @@ export default function AiAnalysisPanel({ id, proposal, autoStart = true, showHe
             <div className="flex justify-between items-start mb-2">
               <div className="text-sm font-medium">AI Generated Draft / Summary</div>
               <div className="flex items-center gap-2">
+              <div className="relative group">
+                  <button
+                    className="px-2 py-1 text-sm rounded border"
+                    onClick={() => {
+                      try {
+                        navigator.clipboard.writeText(analysisResult);
+                      } catch (_) {}
+                    }}
+                  >
+                    Copy
+                  </button>
+                  <span className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                    Salin teks
+                  </span>
+                </div>
                 <button
-                  className="px-2 py-1 text-sm rounded border"
-                  onClick={() => {
-                    try {
-                      navigator.clipboard.writeText(analysisResult || "");
-                    } catch (_) {}
-                  }}
-                >
-                  Copy
-                </button>
-                <button
-                  className="px-2 py-1 text-sm rounded bg-white border"
+                  className="px-2 py-1 text-sm rounded bg-white border cursor-pointer"
                   onClick={() => {
                     try {
                       if (id) sessionStorage.removeItem(`ai_analysis_${id}`);
@@ -58,8 +63,8 @@ export default function AiAnalysisPanel({ id, proposal, autoStart = true, showHe
                 </button>
               </div>
             </div>
-            <pre className="text-sm whitespace-pre-wrap" style={{ color: colors.base[700] }}>
-              {analysisResult}
+            <pre className="text-sm whitespace-pre-wrap" style={{ color: colors.base[700], fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            {analysisResult?.replace(/\**\*/g, "")}
             </pre>
           </div>
         ) : (

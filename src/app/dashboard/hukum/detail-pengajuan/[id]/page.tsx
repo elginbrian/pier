@@ -83,7 +83,6 @@ const HukumDetailByIdPage: React.FC = () => {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex items-center space-x-2 mb-6 text-sm">
-          <span style={{ color: colors.primary[600] }}>📋</span>
           <span className="font-medium" style={{ color: colors.base[700] }}>
             Detail Pengajuan - {proposal.proposalTitle || proposal.companyName}
           </span>
@@ -138,7 +137,6 @@ const HukumDetailByIdPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm">
               <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
                 <div className="flex items-center space-x-2">
-                  <span style={{ color: colors.primary[300] }}>🤖</span>
                   <div>
                     <h3 className="font-semibold" style={{ color: colors.base[700] }}>
                       Draft Kontrak Otomatis
@@ -204,7 +202,6 @@ const HukumDetailByIdPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div style={{ backgroundColor: colors.primary[100] }} className="px-6 py-3">
                 <div className="flex items-center space-x-2">
-                  <span style={{ color: colors.primary[400] }}>✅</span>
                   <h3 className="font-semibold" style={{ color: colors.base[700] }}>
                     Review & Komentar
                   </h3>
@@ -284,7 +281,7 @@ const HukumDetailByIdPage: React.FC = () => {
       </div>
 
       {confirmReject && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <div className="flex items-start space-x-3">
               <FiAlertCircle size={22} className="text-yellow-500" />

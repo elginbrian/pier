@@ -1,49 +1,41 @@
 "use client";
 
-import { app } from "../firebase/init";
 import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFirebaseApp } from "../firebase/init"; // gunakan helper
 
-export type VendorRegistrationPayload = {
-  tipeVendor: string;
-  emailVendor: string;
-  namaVendor: string;
-  noNpwpVendor: string;
-  dokumenAdminUrl?: string;
-  dokumenLegalUrl?: string;
-  dokumenTeknikalUrl?: string;
-  dokumenFinansialUrl?: string;
-  userId?: string | null;
-};
+let db: ReturnType<typeof getFirestore> | null = null;
+let storage: ReturnType<typeof getStorage> | null = null;
 
-const db = getFirestore(app);
-const storage = getStorage(app);
+// inisialisasi hanya jika di client
+if (typeof window !== "undefined") {
+  const app = getFirebaseApp();
+  db = getFirestore(app);
+  storage = getStorage(app);
+}
 
 async function uploadFile(file: File, path: string): Promise<string> {
+  if (!storage) throw new Error("Firebase Storage belum diinisialisasi");
   const r = storageRef(storage, path);
   const snapshot = await uploadBytes(r, file);
   const url = await getDownloadURL(snapshot.ref);
   return url;
 }
 
-export async function submitVendorRegistration(payload: VendorRegistrationPayload, files?: Record<string, File | null>) {
+// fungsi submit
+export async function submitVendorRegistration(payload: any, files?: Record<string, File | null>) {
+  if (!db) throw new Error("Firestore belum diinisialisasi");
+
   const fileUploads: Partial<Record<string, string>> = {};
 
   if (files) {
-    const entries = Object.entries(files);
-    for (const [key, file] of entries) {
+    for (const [key, file] of Object.entries(files)) {
       if (file) {
         const timestamp = Date.now();
         const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
         const userId = payload.userId ? `${payload.userId}_` : "anon_";
         const path = `vendor-registrations/${timestamp}_${userId}${key}_${safeName}`;
-        try {
-          const url = await uploadFile(file, path);
-          fileUploads[key] = url;
-        } catch (e) {
-          console.error("Failed to upload", key, e);
-          throw e;
-        }
+        fileUploads[key] = await uploadFile(file, path);
       }
     }
   }
@@ -55,14 +47,9 @@ export async function submitVendorRegistration(payload: VendorRegistrationPayloa
     noNpwpVendor: payload.noNpwpVendor,
     status: "pending",
     createdAt: serverTimestamp(),
+    ...fileUploads,
+    ...(payload.userId ? { userId: payload.userId } : {}),
   };
-
-  if (payload.userId) doc.userId = payload.userId;
-
-  if (fileUploads["dokumenAdmin"]) doc.dokumenAdminUrl = fileUploads["dokumenAdmin"];
-  if (fileUploads["dokumenLegal"]) doc.dokumenLegalUrl = fileUploads["dokumenLegal"];
-  if (fileUploads["dokumenTeknikal"]) doc.dokumenTeknikalUrl = fileUploads["dokumenTeknikal"];
-  if (fileUploads["dokumenFinansial"]) doc.dokumenFinansialUrl = fileUploads["dokumenFinansial"];
 
   const col = collection(db, "vendor_registrations");
   const ref = await addDoc(col, doc);
