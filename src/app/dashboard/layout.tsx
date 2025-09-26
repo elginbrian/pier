@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           )}
 
-          <div className="flex-1 md:pl-[220px]">
+          <div className="flex-1 md:pl-[260px]">
             <div className="max-w-[1200px] mx-auto">{children}</div>
           </div>
         </div>
