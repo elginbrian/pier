@@ -5,7 +5,7 @@ export default function TestimonialsSection() {
   return (
     <section className="py-16">
       <div className="max-w-7xl mx-auto px-6">
-        <h3 className="text-3xl font-extrabold text-center mb-8 reveal-from-left">Apa Kata Klien Kami</h3>
+        <h3 className="text-3xl font-extrabold text-center mb-8 reveal-from-left">What Our Clients Say</h3>
 
         <div className="rounded-xl overflow-hidden reveal-from-bottom" style={{ backgroundColor: colors.primary[300] }}>
           <div className="p-8 md:p-12 flex items-center gap-8">

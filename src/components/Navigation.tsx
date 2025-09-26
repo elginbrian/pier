@@ -30,7 +30,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = "" }) => {
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
-                placeholder="Cari riwayat laporanmu di sini..."
+                placeholder="Search your report history here..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 className="w-full px-3 py-2 pr-10 rounded-full border border-transparent bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -47,16 +47,16 @@ const Navigation: React.FC<NavigationProps> = ({ className = "" }) => {
           <div className="hidden md:block">
             <div className="ml-6 flex items-baseline space-x-6">
               <a href="#" className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
-                Beranda
+                Home
               </a>
               <a href="#" className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
-                Fitur
+                Features
               </a>
               <a href="#" className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
-                Tentang
+                About
               </a>
               <a href="#" className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
-                Kontak
+                Contact
               </a>
             </div>
           </div>

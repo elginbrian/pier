@@ -27,16 +27,16 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
     if (!email || !password) {
-      setError("Email dan password wajib diisi");
+      setError("Email and password are required");
       return;
     }
     setLoading(true);
     try {
       await signUp(email, password);
-      showToast("success", "Akun dibuat. Cek email untuk verifikasi.");
+      showToast("success", "Account created. Check your email for verification.");
       router.push("/");
     } catch (err: any) {
-      const msg = err?.message || "Gagal mendaftar";
+      const msg = err?.message || "Failed to register";
       setError(msg);
       showToast("error", msg);
     } finally {
@@ -61,7 +61,7 @@ export default function RegisterPage() {
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <Input label="Full name" placeholder="Nama lengkap" value={fullname} onChange={(e) => setFullname(e.target.value)} leftIcon={<FiUser />} />
+              <Input label="Full name" placeholder="Full name" value={fullname} onChange={(e) => setFullname(e.target.value)} leftIcon={<FiUser />} />
 
               <Input label="Email" placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} leftIcon={<FiMail />} />
 
@@ -70,14 +70,14 @@ export default function RegisterPage() {
               {error && <div className="text-sm text-red-600">{error}</div>}
 
               <Button type="submit" disabled={loading} className="w-full bg-[color:var(--pier-primary-700)] text-white py-3 rounded-md font-medium hover:brightness-95">
-                {loading ? "Mendaftarkan..." : "Daftar"}
+                {loading ? "Registering..." : "Register"}
               </Button>
             </form>
 
             <p className="text-center text-sm text-gray-600 mt-6">
-              Sudah punya akun?{" "}
+              Already have an account?{" "}
               <Link href="/auth/login" className="text-[color:var(--pier-primary-700)] hover:underline">
-                Masuk
+                Sign in
               </Link>
             </p>
 

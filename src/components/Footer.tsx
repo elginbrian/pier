@@ -16,11 +16,11 @@ export default function Footer() {
                 <Image src="/logo-pelindo.png" alt="Pelindo" width={120} height={48} style={{ filter: "brightness(0) invert(1)" }} />
               </div>
             </div>
-            <p className="mt-4 text-sm text-indigo-100">Transformasi digital untuk manajemen kontrak yang lebih efisien dan profesional.</p>
+            <p className="mt-4 text-sm text-indigo-100">Digital transformation for more efficient and professional contract management.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-3">Kontak</h4>
+            <h4 className="font-semibold mb-3">Contact</h4>
             <ul className="text-sm space-y-3 text-white">
               <li className="flex items-center">
                 <FiPhone className="mr-3" /> <span>+62 21 1234 5678</span>
@@ -35,21 +35,21 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-3">Tautan</h4>
+            <h4 className="font-semibold mb-3">Links</h4>
             <ul className="text-sm space-y-2 text-indigo-100">
               <li>
                 <a href="#" className="hover:underline">
-                  Tentang Kami
+                  About Us
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Layanan
+                  Services
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Karir
+                  Careers
                 </a>
               </li>
               <li>
@@ -65,17 +65,17 @@ export default function Footer() {
             <ul className="text-sm space-y-2 text-indigo-100">
               <li>
                 <a href="#" className="hover:underline">
-                  Kebijakan Privasi
+                  Privacy Policy
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Syarat &amp; Ketentuan
+                  Terms &amp; Conditions
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Keamanan
+                  Security
                 </a>
               </li>
             </ul>
