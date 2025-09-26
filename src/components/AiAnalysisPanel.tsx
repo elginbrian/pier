@@ -5,6 +5,94 @@ import { colors } from "@/design-system";
 import Spinner from "@/components/Spinner";
 import useAiAnalysis from "@/hooks/useAiAnalysis";
 
+function renderMarkdown(md: string | null | undefined) {
+  if (!md) return null;
+  const lines = md.split(/\r?\n/);
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    if (!line) {
+      nodes.push(<div key={i} style={{ height: 8 }} />);
+      i++;
+      continue;
+    }
+
+    if (/^\d+\.\s+/.test(line)) {
+      const items: React.ReactNode[] = [];
+      while (i < lines.length && /^\d+\.\s+/.test(lines[i].trim())) {
+        const item = lines[i].trim().replace(/^\d+\.\s+/, "");
+        items.push(<li key={i}>{renderInlineMarkdown(item)}</li>);
+        i++;
+      }
+      nodes.push(
+        <ol key={`ol-${i}`} className="list-decimal list-inside">
+          {items}
+        </ol>
+      );
+      continue;
+    }
+
+    if (/^[\-*]\s+/.test(line)) {
+      const items: React.ReactNode[] = [];
+      while (i < lines.length && /^[\-*]\s+/.test(lines[i].trim())) {
+        const item = lines[i].trim().replace(/^[\-*]\s+/, "");
+        items.push(<li key={i}>{renderInlineMarkdown(item)}</li>);
+        i++;
+      }
+      nodes.push(
+        <ul key={`ul-${i}`} className="list-disc list-inside">
+          {items}
+        </ul>
+      );
+      continue;
+    }
+
+    if (/^#{1,6}\s+/.test(line)) {
+      const m = line.match(/^(#{1,6})\s+(.*)$/);
+      if (m) {
+        const level = m[1].length;
+        const content = renderInlineMarkdown(m[2]);
+        const tagName = `h${Math.min(6, level)}`;
+        nodes.push(React.createElement(tagName, { key: i, className: `font-semibold ${level <= 2 ? "text-lg" : "text-base"}` }, content));
+        i++;
+        continue;
+      }
+    }
+
+    nodes.push(
+      <p key={i} className="mb-2">
+        {renderInlineMarkdown(line)}
+      </p>
+    );
+    i++;
+  }
+
+  return <div>{nodes}</div>;
+}
+
+function renderInlineMarkdown(text: string) {
+  const parts: React.ReactNode[] = [];
+  let chunkIndex = 0;
+  const boldSplit = text.split(/(\*\*[^*]+\*\*)/g);
+  boldSplit.forEach((part, idx) => {
+    if (/^\*\*[^*]+\*\*$/.test(part)) {
+      const inner = part.replace(/^\*\*(.*)\*\*$/, "$1");
+      parts.push(<strong key={`b-${chunkIndex++}`}>{inner}</strong>);
+    } else {
+      const italicSplit = part.split(/(\*[^*]+\*)/g);
+      italicSplit.forEach((p) => {
+        if (/^\*[^*]+\*$/.test(p)) {
+          parts.push(<em key={`i-${chunkIndex++}`}>{p.replace(/^\*(.*)\*$/, "$1")}</em>);
+        } else {
+          parts.push(<span key={`t-${chunkIndex++}`}>{p}</span>);
+        }
+      });
+    }
+  });
+  return <>{parts}</>;
+}
+
 type Props = {
   id?: string | null;
   proposal?: any;

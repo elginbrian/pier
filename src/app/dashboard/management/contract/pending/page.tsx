@@ -14,7 +14,7 @@ const PendingContractsPage = () => {
   const [loading, setLoading] = useState(false);
 
   const handleContractClick = (contractId: string) => {
-    router.push(`/dashboard/management/contract/pending/detail?id=${contractId}`);
+    router.push(`/dashboard/management/contract/${contractId}`);
   };
 
   useEffect(() => {

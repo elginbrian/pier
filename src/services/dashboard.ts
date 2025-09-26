@@ -518,17 +518,33 @@ export async function getContractDetails(contractId: string): Promise<ContractDe
     });
 
     // Get contract notifications
-    const notificationsQuery = query(collection(db, "contract_notifications"), where("contractId", "==", contractId), orderBy("createdAt", "desc"), limit(10));
-
-    const notificationsSnapshot = await getDocs(notificationsQuery);
     const notifications: ContractNotification[] = [];
+    try {
+      const notificationsQuery = query(collection(db, "contract_notifications"), where("contractId", "==", contractId), orderBy("createdAt", "desc"), limit(10));
+      const notificationsSnapshot = await getDocs(notificationsQuery);
+      notificationsSnapshot.forEach((doc) => {
+        notifications.push({ id: doc.id, ...doc.data() } as ContractNotification);
+      });
+    } catch (notifErr) {
+      try {
+        const notificationsQuery2 = query(collection(db, "contract_notifications"), where("contractId", "==", contractId));
+        const notificationsSnapshot2 = await getDocs(notificationsQuery2);
+        notificationsSnapshot2.forEach((doc) => {
+          notifications.push({ id: doc.id, ...doc.data() } as ContractNotification);
+        });
 
-    notificationsSnapshot.forEach((doc) => {
-      notifications.push({
-        id: doc.id,
-        ...doc.data(),
-      } as ContractNotification);
-    });
+        // Sort by createdAt desc if available
+        notifications.sort((a, b) => {
+          const aTime = a.createdAt && (a.createdAt as any).toDate ? (a.createdAt as any).toDate().getTime() : 0;
+          const bTime = b.createdAt && (b.createdAt as any).toDate ? (b.createdAt as any).toDate().getTime() : 0;
+          return bTime - aTime;
+        });
+        // limit to 10
+        if (notifications.length > 10) notifications.splice(10);
+      } catch (e2) {
+        console.error("[dashboard] Fallback notifications fetch failed:", e2);
+      }
+    }
 
     const completedMilestones = milestones.filter((m) => m.status === "completed").length;
     const totalMilestones = milestones.length;
