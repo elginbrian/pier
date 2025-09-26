@@ -1,58 +1,23 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { MagnifyingGlassIcon, DocumentTextIcon, DocumentChartBarIcon, ArrowDownTrayIcon, ExclamationTriangleIcon, ClockIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { colors } from "../../design-system";
 
 export default function DashboardPage() {
+  const router = useRouter();
   return (
     <div style={{ minHeight: "100vh" }}>
       <div>
         <div className="mx-auto">
-          <header className="fixed top-0 z-30 bg-white border-b border-gray-200 shadow-sm w-full md:left-[260px] md:w-[calc(100%-260px)]">
-            <div className="flex items-center justify-between px-6 py-4">
-              <div className="md:hidden">
-                <button aria-label="open menu" onClick={() => {}} className="p-2 rounded-md border bg-white shadow-sm" style={{ borderColor: colors.base[300] }}>
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M4 6h16M4 12h16M4 18h16" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
-
-              <h1 className="hidden md:block text-2xl font-semibold text-gray-900 md:ml-[220px]">Dashboard</h1>
-
-              <h1 className="md:hidden text-xl font-semibold text-gray-900">Dashboard</h1>
-
-              <div className="flex items-center gap-4">
-                <div className="relative hidden sm:block">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input placeholder="Cari kontrak..." className="pl-10 pr-4 py-2 rounded-lg border bg-white shadow-sm text-sm" style={{ borderColor: colors.base[200], minWidth: 250 }} />
-                </div>
-                <div className="w-8 h-8 rounded-full bg-white border flex items-center justify-center shadow-sm text-xs font-medium" style={{ borderColor: colors.base[200] }}>
-                  3
-                </div>
-                <div className="hidden sm:flex items-center gap-3">
-                  <img src="/testimony.png" alt="avatar" className="w-8 h-8 rounded-full" />
-                  <div className="text-sm">
-                    <div className="font-medium text-gray-900">PT. Makan Gratis B</div>
-                    <div className="text-xs text-gray-500">Manager Procurement</div>
-                  </div>
-                </div>
-
-                <div className="sm:hidden">
-                  <img src="/testimony.png" alt="avatar" className="w-8 h-8 rounded-full" />
-                </div>
-              </div>
-            </div>
-          </header>
-
-          <div className="h-16 md:h-16" aria-hidden />
+          <div className="h-4 md:h-4" aria-hidden />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="rounded-xl p-6 shadow-sm border border-gray-100" style={{ backgroundColor: colors.primary[300] }}>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: colors.primary[300] }}>
-                  <DocumentTextIcon className="w-12 h-12 text-white" />
+                <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center bg-white/10">
+                  <DocumentTextIcon className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-semibold text-white">PT Vendor Teknologi</div>
@@ -64,8 +29,8 @@ export default function DashboardPage() {
 
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center">
-                  <DocumentChartBarIcon className="w-12 h-12" style={{ color: colors.primary[300] }} />
+                <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center bg-blue-50">
+                  <DocumentChartBarIcon className="w-8 h-8" style={{ color: colors.primary[300] }} />
                 </div>
                 <div className="flex-1">
                   <div className="text-sm text-gray-500 mb-1">Kontrak Aktif</div>
@@ -78,12 +43,16 @@ export default function DashboardPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="text-center">
-                <div className="text-sm text-gray-500 mb-1">Mendekati Expired</div>
-                <div className="text-3xl font-bold text-orange-500 mb-1">18</div>
-                <div className="text-xs text-orange-500 flex items-center justify-center gap-1">
-                  <ExclamationTriangleIcon className="w-3 h-3" />
-                  30 hari
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center bg-orange-100">
+                  <ExclamationTriangleIcon className="w-8 h-8 text-orange-500" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm text-gray-500 mb-1">Mendekati Expired</div>
+                  <div className="text-3xl font-bold text-orange-500 mb-1">18</div>
+                  <div className="text-xs text-orange-500 flex items-center gap-1">
+                    <span className="text-xs">30 hari</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -160,7 +129,11 @@ export default function DashboardPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Aksi Cepat</h3>
               <div className="space-y-3">
-                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-white transition-colors" style={{ backgroundColor: colors.primary[300] }}>
+                <button
+                  onClick={() => router.push("/dashboard/proposal/create")}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-white transition-colors"
+                  style={{ backgroundColor: colors.primary[300] }}
+                >
                   <PlusIcon className="w-4 h-4" />
                   Ajukan Proposal Baru
                 </button>
