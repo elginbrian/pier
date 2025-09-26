@@ -217,7 +217,15 @@ const ManagementContractPage = () => {
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                   >
                     <td className="py-4 px-6 text-sm font-medium" style={{ color: colors.base[700] }}>
-                      {contract.id}
+                      <button
+                        onClick={() => {
+                          window.location.href = `/dashboard/management/contract/${contract.id}`;
+                        }}
+                        className="text-left w-full text-sm font-medium"
+                        style={{ color: colors.base[700] }}
+                      >
+                        {contract.id}
+                      </button>
                     </td>
                     <td className="py-4 px-6">
                       <div className="text-sm font-bold" style={{ color: colors.base[700] }}>

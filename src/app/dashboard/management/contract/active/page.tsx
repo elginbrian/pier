@@ -12,7 +12,7 @@ const ManagementContractActivePage = () => {
   const [filterStatus, setFilterStatus] = useState("Semua Status");
 
   const handleContractClick = (contractId: string) => {
-    router.push(`/dashboard/management/contract/active/detail?id=${contractId}`);
+    router.push(`/dashboard/management/contract/${contractId}`);
   };
 
   const [contractsData, setContractsData] = useState<any[]>([]);
