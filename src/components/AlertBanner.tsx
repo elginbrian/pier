@@ -1,41 +1,46 @@
-import React from 'react';
+import React from "react";
 
 interface AlertBannerProps {
-  type?: 'info' | 'warning' | 'error' | 'success';
+  type?: "info" | "warning" | "error" | "success";
   message: string;
   className?: string;
 }
 
-const AlertBanner: React.FC<AlertBannerProps> = ({ 
-  type = 'info', 
-  message, 
-  className = '' 
-}) => {
-  const getStyles = () => {
+const AlertBanner: React.FC<AlertBannerProps> = ({ type = "info", message, className = "" }) => {
+  type Styles = { container: string; icon: string; text: string };
+
+  const getStyles = (): Styles => {
     switch (type) {
-      case 'info':
+      case "info":
         return {
-          container: 'bg-blue-50 border-blue-200',
-          icon: 'text-blue-600 bg-blue-100',
-          text: 'text-blue-700'
+          container: "bg-blue-50 border-blue-200",
+          icon: "text-blue-600 bg-blue-100",
+          text: "text-blue-700",
         };
-      case 'warning':
+      case "warning":
         return {
-          container: 'bg-yellow-50 border-yellow-200',
-          icon: 'text-yellow-600 bg-yellow-100',
-          text: 'text-yellow-700'
+          container: "bg-yellow-50 border-yellow-200",
+          icon: "text-yellow-600 bg-yellow-100",
+          text: "text-yellow-700",
         };
-      case 'error':
+      case "error":
         return {
-          container: 'bg-red-50 border-red-200',
-          icon: 'text-red-600 bg-red-100',
-          text: 'text-red-700'
+          container: "bg-red-50 border-red-200",
+          icon: "text-red-600 bg-red-100",
+          text: "text-red-700",
         };
-      case 'success':
+      case "success":
         return {
-          container: 'bg-green-50 border-green-200',
-          icon: 'text-green-600 bg-green-100',
-          text: 'text-green-700'
+          container: "bg-green-50 border-green-200",
+          icon: "text-green-600 bg-green-100",
+          text: "text-green-700",
+        };
+      default:
+        // fallback safe styles
+        return {
+          container: "bg-gray-50 border-gray-200",
+          icon: "text-gray-600 bg-gray-100",
+          text: "text-gray-700",
         };
     }
   };
@@ -49,9 +54,7 @@ const AlertBanner: React.FC<AlertBannerProps> = ({
           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
         </svg>
       </div>
-      <p className={`text-sm ${styles.text}`}>
-        {message}
-      </p>
+      <p className={`text-sm ${styles.text}`}>{message}</p>
     </div>
   );
 };
