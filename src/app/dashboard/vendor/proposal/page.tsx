@@ -78,16 +78,48 @@ const ProposalPage = () => {
     const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
     const currentYear = new Date().getFullYear();
 
-    return months.map((month) => {
-      // For demo purposes, we'll use some calculated data based on real stats
-      // In a real app, you'd track historical data
-      const activeCount = Math.floor(Math.random() * 50) + stats.activeContracts;
-      const completedCount = Math.floor(Math.random() * 30) + 20;
+    const toDate = (value: any): Date | null => {
+      if (!value) return null;
+      try {
+        if (typeof value?.toDate === "function") return value.toDate();
+        const d = new Date(value);
+        return isNaN(d.getTime()) ? null : d;
+      } catch (e) {
+        return null;
+      }
+    };
+
+    return months.map((m, idx) => {
+      const monthStart = new Date(currentYear, idx, 1, 0, 0, 0, 0);
+      const monthEnd = new Date(currentYear, idx + 1, 0, 23, 59, 59, 999);
+
+      const aktif = contracts.filter((c) => {
+        const start = toDate(c.startDate) || toDate(c.createdAt);
+        const end = toDate(c.endDate);
+
+        if (c.status !== "active") return false;
+        if (!start) return false;
+
+        if (start > monthEnd) return false;
+        if (end && end < monthStart) return false;
+        return true;
+      }).length;
+
+      const selesai = contracts.filter((c) => {
+        const end = toDate(c.endDate);
+        if (!end) return false;
+
+        const endedThisMonth = end >= monthStart && end <= monthEnd;
+
+        const isCompletedStatus = c.status === "expired" || c.status === "terminated";
+
+        return endedThisMonth && isCompletedStatus;
+      }).length;
 
       return {
-        month,
-        aktif: activeCount,
-        selesai: completedCount,
+        month: m,
+        aktif,
+        selesai,
       };
     });
   };
@@ -125,10 +157,9 @@ const ProposalPage = () => {
     );
   };
 
-  // Contract table data - use real proposals data
   const contractsData = paginatedProposals.map((proposal) => ({
     id: proposal.id.substring(0, 6),
-    originalId: proposal.id, // Keep original ID for navigation
+    originalId: proposal.id,
     name: proposal.proposalTitle,
     amount: proposal.contractValue || "Rp 0",
     expiry: new Date(proposal.createdAt?.toDate?.() || proposal.createdAt).toLocaleDateString("id-ID"),
@@ -158,11 +189,9 @@ const ProposalPage = () => {
   };
 
   const handleProposalClick = (proposalId: string) => {
-    // Navigate to contract page since proposals become contracts when processed
     router.push(`/dashboard/vendor/contract?id=${proposalId}`);
   };
 
-  // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.base[100] }}>

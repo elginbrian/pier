@@ -18,7 +18,7 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size">
   error?: string;
   /** Help text */
   helperText?: string;
-  /** Custom container className */
+
   containerClassName?: string;
 }
 
@@ -27,10 +27,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     const [isFocused, setIsFocused] = useState(false);
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Determine actual state (error takes precedence)
     const actualState = error ? "error" : state;
 
-    // Container styles based on variant and state
     const getContainerStyles = (): React.CSSProperties => {
       const base: React.CSSProperties = {
         position: "relative",
