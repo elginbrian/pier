@@ -22,8 +22,7 @@ export default function ContractReviewPage() {
       "Pembayaran dibagi menjadi 3 termin (3-). Termin 1(20%): Pembayaran di muka setelah penandatanganan kontrak. Termin 2(50%): Setelah deployment sistem dan UAT (User Acceptance Test) modul utama selesai. Termin 3(30%): 30 hari setelah serah terima proyek dan realisasi pelatihan (training).",
   });
 
-  // Contract status - change this to simulate different states
-  const isDeclined = true; // Set to true to show declined state
+  const isDeclined = true;
   const currentStep = 2;
   const declinedStep = 1;
 

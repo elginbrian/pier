@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useState } from "react";
 import { FormData, INITIAL_FORM_DATA } from "./constants";
 import vendorService from "../../services/vendorRegistration";
