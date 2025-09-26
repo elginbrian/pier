@@ -38,15 +38,24 @@ const ManagementContractPage = () => {
   };
 
   const getTagBadge = (tag: string) => {
+    const tags = typeof tag === "string" ? tag.split(",").map((t) => t.trim()) : [];
+
     const tagConfig: Record<string, { bg: string; text: string }> = {
       Properti: { bg: colors.primary[100], text: colors.primary[700] },
       Sewa: { bg: colors.info[100], text: colors.info[700] },
     };
-    const config = tagConfig[tag] || { bg: colors.base[100], text: colors.base[700] };
+
     return (
-      <span className="px-2 py-1 rounded text-xs font-medium" style={{ backgroundColor: config.bg, color: config.text }}>
-        {tag}
-      </span>
+      <div className="flex items-center space-x-2">
+        {tags.map((t) => {
+          const config = tagConfig[t] || { bg: colors.base[100], text: colors.base[700] };
+          return (
+            <span key={t} className="px-3 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: config.bg, color: config.text }}>
+              {t}
+            </span>
+          );
+        })}
+      </div>
     );
   };
 

@@ -6,6 +6,8 @@ import { colors } from "@/design-system";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/Spinner";
 import { subscribeToProposals, updateProposalStatus } from "@/services/proposals";
+import { useToasts } from "@/components/ToastProvider";
+import { FiCheck, FiX, FiClock, FiAlertCircle } from "react-icons/fi";
 
 const DetailPengajuanPage = () => {
   const { user, loading } = useAuth();
@@ -32,11 +34,22 @@ const DetailPengajuanPage = () => {
     try {
       setBusyId(id);
       await updateProposalStatus(id, status, user.uid, status === "rejected" ? "Ditolak oleh tim hukum" : null);
+      showToast("success", `Status diubah menjadi ${status}`);
     } catch (e) {
       console.error("Failed to set status", e);
+      showToast("error", "Gagal mengubah status proposal");
     } finally {
       setBusyId(null);
     }
+  };
+
+  const { showToast } = useToasts();
+
+  const [confirmReject, setConfirmReject] = React.useState<{ id: string; open: boolean } | null>(null);
+
+  const handleConfirmReject = async (id: string) => {
+    setConfirmReject(null);
+    await handleSetStatus(id, "rejected");
   };
 
   const getStatusBadge = (status: string) => {
@@ -170,14 +183,14 @@ const DetailPengajuanPage = () => {
                     <td className="py-4 px-6">{getStatusBadge(p.status)}</td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
-                        <button disabled={busyId === p.id} onClick={() => handleSetStatus(p.id, "under_review")} className="px-3 py-1 rounded text-sm" style={{ backgroundColor: colors.info[100], color: colors.info[700] }}>
-                          {busyId === p.id && p.status === "under_review" ? "..." : "Mark Review"}
+                        <button title="Mark Review" disabled={busyId === p.id} onClick={() => handleSetStatus(p.id, "under_review")} className="p-2 rounded" style={{ backgroundColor: colors.info[100], color: colors.info[700] }}>
+                          {busyId === p.id && p.status === "under_review" ? "..." : <FiClock size={16} />}
                         </button>
-                        <button disabled={busyId === p.id} onClick={() => handleSetStatus(p.id, "approved")} className="px-3 py-1 rounded text-sm" style={{ backgroundColor: colors.success[100], color: colors.success[700] }}>
-                          {busyId === p.id && p.status === "approved" ? "..." : "Approve"}
+                        <button title="Approve" disabled={busyId === p.id} onClick={() => handleSetStatus(p.id, "approved")} className="p-2 rounded" style={{ backgroundColor: colors.success[100], color: colors.success[700] }}>
+                          {busyId === p.id && p.status === "approved" ? "..." : <FiCheck size={16} />}
                         </button>
-                        <button disabled={busyId === p.id} onClick={() => handleSetStatus(p.id, "rejected")} className="px-3 py-1 rounded text-sm" style={{ backgroundColor: colors.error[100], color: colors.error[700] }}>
-                          {busyId === p.id && p.status === "rejected" ? "..." : "Reject"}
+                        <button title="Reject" disabled={busyId === p.id} onClick={() => setConfirmReject({ id: p.id, open: true })} className="p-2 rounded" style={{ backgroundColor: colors.error[100], color: colors.error[700] }}>
+                          <FiX size={16} />
                         </button>
                       </div>
                     </td>
@@ -193,6 +206,30 @@ const DetailPengajuanPage = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Confirm Reject Modal */}
+          {confirmReject?.open && (
+            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-96">
+                <div className="flex items-start space-x-3">
+                  <FiAlertCircle size={22} className="text-yellow-500" />
+                  <div>
+                    <h3 className="font-semibold">Konfirmasi Tolak Proposal</h3>
+                    <p className="text-sm text-gray-600">Apakah Anda yakin ingin menolak proposal ini? Tindakan ini tidak dapat diurungkan.</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex justify-end gap-2">
+                  <button onClick={() => setConfirmReject(null)} className="px-3 py-2 rounded" style={{ border: `1px solid ${colors.base[300]}` }}>
+                    Batal
+                  </button>
+                  <button onClick={() => handleConfirmReject(confirmReject.id)} className="px-3 py-2 rounded text-white" style={{ backgroundColor: colors.error[600] }}>
+                    Tolak
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center justify-between px-6 py-4" style={{ borderTop: `1px solid ${colors.base[200]}` }}>
             <p className="text-sm" style={{ color: colors.base[600] }}>

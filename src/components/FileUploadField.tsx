@@ -47,11 +47,11 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({ label, fieldName, fie
         className={`w-full p-4 border rounded-xl bg-gray-50 ${isDragOver ? "border-dashed border-2" : ""} ${error ? "border-red-400" : ""}`}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-600">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="flex-1">
               {file ? (
-                <div>
-                  <div className="font-medium">{file.name}</div>
+                <div className="min-w-0">
+                  <div className="font-medium truncate max-w-[300px]">{file.name}</div>
                   <div className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
                 </div>
               ) : (
@@ -69,7 +69,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({ label, fieldName, fie
 
             <button
               type="button"
-              className={`px-3 py-1 text-sm font-medium text-white rounded-lg ${isUploading ? "opacity-60 cursor-wait" : ""}`}
+              className={`px-3 py-1 text-sm font-medium text-white rounded ${isUploading ? "opacity-60 cursor-wait" : ""}`}
               style={{ backgroundColor: colors.primary[300] }}
               onClick={() => document.getElementById(fieldName)?.click()}
               aria-disabled={isUploading}
@@ -80,9 +80,11 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({ label, fieldName, fie
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between mt-2">
-        <p className="text-xs text-gray-500">Only PDF files accepted. Max 5MB.</p>
-        {error ? <div className="text-xs text-red-600">{error}</div> : null}
+      <div className="mt-2 flex items-center justify-between">
+        <div>
+          <p className="text-xs text-gray-500">Only PDF files accepted. Max 5MB.</p>
+        </div>
+        <div>{error ? <div className="text-xs text-red-600">{error}</div> : <div className="text-xs text-transparent">&nbsp;</div>}</div>
       </div>
     </div>
   );

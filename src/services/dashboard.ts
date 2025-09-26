@@ -1,24 +1,11 @@
 "use client";
 
 import { app } from "../firebase/init";
-import { 
-  getFirestore, 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
-  doc, 
-  getDoc,
-  addDoc,
-  updateDoc,
-  serverTimestamp,
-  orderBy,
-  limit,
-  onSnapshot,
-  Timestamp
-} from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, updateDoc, serverTimestamp, orderBy, limit, onSnapshot, Timestamp } from "firebase/firestore";
+import { getStorage, ref as storageRef, uploadString, getDownloadURL } from "firebase/storage";
 
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 export interface VendorProfile {
   id: string;
@@ -26,7 +13,7 @@ export interface VendorProfile {
   emailVendor: string;
   tipeVendor: string;
   noNpwpVendor: string;
-  status: 'pending' | 'verified' | 'rejected';
+  status: "pending" | "verified" | "rejected";
   createdAt: any;
 }
 
@@ -37,7 +24,7 @@ export interface Contract {
   contractValue: string;
   startDate: string;
   endDate: string;
-  status: 'pending' | 'under_review' | 'approved' | 'active' | 'expired' | 'terminated' | 'rejected';
+  status: "pending" | "under_review" | "approved" | "active" | "expired" | "terminated" | "rejected";
   daysRemaining?: number;
   createdAt: any;
 }
@@ -48,7 +35,7 @@ export interface Proposal {
   companyName: string;
   serviceType: string;
   contractValue: string;
-  status: 'pending' | 'approved' | 'rejected' | 'under_review';
+  status: "pending" | "approved" | "rejected" | "under_review";
   createdAt: any;
 }
 
@@ -61,7 +48,7 @@ export interface DashboardStats {
 
 export interface Notification {
   id: string;
-  type: 'warning' | 'info' | 'success' | 'error';
+  type: "warning" | "info" | "success" | "error";
   title: string;
   message: string;
   createdAt: any;
@@ -71,23 +58,18 @@ export interface Notification {
 // Get vendor profile by user ID
 export async function getVendorProfile(userId: string): Promise<VendorProfile | null> {
   try {
-    const vendorQuery = query(
-      collection(db, "vendor_registrations"),
-      where("userId", "==", userId),
-      where("status", "==", "verified"),
-      limit(1)
-    );
-    
+    const vendorQuery = query(collection(db, "vendor_registrations"), where("userId", "==", userId), where("status", "==", "verified"), limit(1));
+
     const querySnapshot = await getDocs(vendorQuery);
-    
+
     if (querySnapshot.empty) {
       return null;
     }
-    
+
     const doc = querySnapshot.docs[0];
     return {
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     } as VendorProfile;
   } catch (error) {
     console.error("Error fetching vendor profile:", error);
@@ -99,14 +81,11 @@ export async function getVendorProfile(userId: string): Promise<VendorProfile | 
 export async function getVendorContracts(userId: string): Promise<Contract[]> {
   try {
     // Simplified query without orderBy to avoid index requirement
-    const contractsQuery = query(
-      collection(db, "contracts"),
-      where("vendorUserId", "==", userId)
-    );
-    
+    const contractsQuery = query(collection(db, "contracts"), where("vendorUserId", "==", userId));
+
     const querySnapshot = await getDocs(contractsQuery);
     const contracts: Contract[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       const contract: Contract = {
@@ -117,11 +96,11 @@ export async function getVendorContracts(userId: string): Promise<Contract[]> {
         startDate: data.startDate || "",
         endDate: data.endDate || "",
         status: data.status || "pending",
-        createdAt: data.createdAt
+        createdAt: data.createdAt,
       };
 
       // Calculate days remaining if contract is active and has end date
-      if (contract.status === 'active' && contract.endDate) {
+      if (contract.status === "active" && contract.endDate) {
         const endDate = new Date(contract.endDate);
         const today = new Date();
         const diffTime = endDate.getTime() - today.getTime();
@@ -131,13 +110,13 @@ export async function getVendorContracts(userId: string): Promise<Contract[]> {
 
       contracts.push(contract);
     });
-    
+
     // Sort client-side by createdAt (most recent first)
     contracts.sort((a, b) => {
       if (!a.createdAt || !b.createdAt) return 0;
       return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
     });
-    
+
     return contracts;
   } catch (error) {
     console.error("Error fetching vendor contracts:", error);
@@ -148,15 +127,15 @@ export async function getVendorContracts(userId: string): Promise<Contract[]> {
 export async function getContractById(contractId: string): Promise<Contract | null> {
   try {
     console.log("[dashboard] Getting contract by ID:", contractId);
-    
-    const contractDoc = doc(db, 'contracts', contractId);
+
+    const contractDoc = doc(db, "contracts", contractId);
     const contractSnapshot = await getDoc(contractDoc);
-    
+
     if (!contractSnapshot.exists()) {
       console.log("[dashboard] Contract not found:", contractId);
       return null;
     }
-    
+
     const data = contractSnapshot.data();
     const contract: Contract = {
       id: contractSnapshot.id,
@@ -166,21 +145,20 @@ export async function getContractById(contractId: string): Promise<Contract | nu
       startDate: data.startDate || "",
       endDate: data.endDate || "",
       status: data.status || "pending",
-      createdAt: data.createdAt
+      createdAt: data.createdAt,
     };
 
     // Calculate days remaining if contract is active and has end date
-    if (contract.status === 'active' && contract.endDate) {
+    if (contract.status === "active" && contract.endDate) {
       const endDate = new Date(contract.endDate);
       const today = new Date();
       const diffTime = endDate.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       contract.daysRemaining = diffDays > 0 ? diffDays : 0;
     }
-    
+
     console.log("[dashboard] Found contract:", contract);
     return contract;
-    
   } catch (error) {
     console.error("[dashboard] Error getting contract by ID:", error);
     return null;
@@ -191,27 +169,24 @@ export async function getContractById(contractId: string): Promise<Contract | nu
 export async function getVendorProposals(userId: string): Promise<Proposal[]> {
   try {
     // Simplified query without orderBy to avoid index requirement
-    const proposalsQuery = query(
-      collection(db, "proposals"),
-      where("userId", "==", userId)
-    );
-    
+    const proposalsQuery = query(collection(db, "proposals"), where("userId", "==", userId));
+
     const querySnapshot = await getDocs(proposalsQuery);
     const proposals: Proposal[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       proposals.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       } as Proposal);
     });
-    
+
     // Sort client-side by createdAt (most recent first)
     proposals.sort((a, b) => {
       if (!a.createdAt || !b.createdAt) return 0;
       return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
     });
-    
+
     return proposals;
   } catch (error) {
     console.error("Error fetching vendor proposals:", error);
@@ -221,18 +196,14 @@ export async function getVendorProposals(userId: string): Promise<Proposal[]> {
 
 // Calculate dashboard statistics
 export function calculateDashboardStats(contracts: Contract[], proposals: Proposal[]): DashboardStats {
-  const activeContracts = contracts.filter(c => c.status === 'active').length;
-  const pendingProposals = proposals.filter(p => p.status === 'pending').length;
-  const expiringContracts = contracts.filter(c => 
-    c.status === 'active' && 
-    c.daysRemaining !== undefined && 
-    c.daysRemaining <= 30
-  ).length;
-  
+  const activeContracts = contracts.filter((c) => c.status === "active").length;
+  const pendingProposals = proposals.filter((p) => p.status === "pending").length;
+  const expiringContracts = contracts.filter((c) => c.status === "active" && c.daysRemaining !== undefined && c.daysRemaining <= 30).length;
+
   const totalValue = contracts
-    .filter(c => c.status === 'active')
+    .filter((c) => c.status === "active")
     .reduce((sum, c) => {
-      const value = parseFloat(c.contractValue.replace(/[^\d]/g, '')) || 0;
+      const value = parseFloat(c.contractValue.replace(/[^\d]/g, "")) || 0;
       return sum + value;
     }, 0);
 
@@ -240,7 +211,7 @@ export function calculateDashboardStats(contracts: Contract[], proposals: Propos
     activeContracts,
     pendingProposals,
     expiringContracts,
-    totalValue
+    totalValue,
   };
 }
 
@@ -250,52 +221,52 @@ export function generateNotifications(contracts: Contract[], proposals: Proposal
   let notificationId = 1;
 
   // Contract expiration warnings
-  contracts.forEach(contract => {
-    if (contract.status === 'active' && contract.daysRemaining !== undefined) {
+  contracts.forEach((contract) => {
+    if (contract.status === "active" && contract.daysRemaining !== undefined) {
       if (contract.daysRemaining <= 15 && contract.daysRemaining > 0) {
         notifications.push({
           id: `contract-exp-${notificationId++}`,
-          type: 'warning',
+          type: "warning",
           title: `Contract will expire in ${contract.daysRemaining} days`,
           message: `${contract.title} with ${contract.vendorName}`,
           createdAt: Timestamp.now(),
-          read: false
+          read: false,
         });
       } else if (contract.daysRemaining <= 0) {
         notifications.push({
           id: `contract-expired-${notificationId++}`,
-          type: 'error',
-          title: 'Contract has expired',
+          type: "error",
+          title: "Contract has expired",
           message: `${contract.title} with ${contract.vendorName}`,
           createdAt: Timestamp.now(),
-          read: false
+          read: false,
         });
       }
     }
   });
 
   // Proposal status updates
-  const pendingProposals = proposals.filter(p => p.status === 'pending');
+  const pendingProposals = proposals.filter((p) => p.status === "pending");
   if (pendingProposals.length > 0) {
     notifications.push({
       id: `proposals-pending-${notificationId++}`,
-      type: 'info',
-      title: 'Proposals awaiting review',
-      message: `${pendingProposals.length} proposal${pendingProposals.length > 1 ? 's' : ''} are awaiting review`,
+      type: "info",
+      title: "Proposals awaiting review",
+      message: `${pendingProposals.length} proposal${pendingProposals.length > 1 ? "s" : ""} are awaiting review`,
       createdAt: Timestamp.now(),
-      read: false
+      read: false,
     });
   }
 
-  const underReviewProposals = proposals.filter(p => p.status === 'under_review');
+  const underReviewProposals = proposals.filter((p) => p.status === "under_review");
   if (underReviewProposals.length > 0) {
     notifications.push({
       id: `proposals-review-${notificationId++}`,
-      type: 'info',
-      title: 'Legal review pending approval',
-      message: `${underReviewProposals.length} proposal${underReviewProposals.length > 1 ? 's' : ''} are under legal review`,
+      type: "info",
+      title: "Legal review pending approval",
+      message: `${underReviewProposals.length} proposal${underReviewProposals.length > 1 ? "s" : ""} are under legal review`,
       createdAt: Timestamp.now(),
-      read: false
+      read: false,
     });
   }
 
@@ -303,26 +274,12 @@ export function generateNotifications(contracts: Contract[], proposals: Proposal
 }
 
 // Set up real-time listener for vendor data
-export function subscribeToVendorData(
-  userId: string,
-  onDataUpdate: (data: {
-    contracts: Contract[];
-    proposals: Proposal[];
-    stats: DashboardStats;
-    notifications: Notification[];
-  }) => void
-) {
+export function subscribeToVendorData(userId: string, onDataUpdate: (data: { contracts: Contract[]; proposals: Proposal[]; stats: DashboardStats; notifications: Notification[] }) => void) {
   // Listen to contracts - simplified query without orderBy
-  const contractsQuery = query(
-    collection(db, "contracts"),
-    where("vendorUserId", "==", userId)
-  );
+  const contractsQuery = query(collection(db, "contracts"), where("vendorUserId", "==", userId));
 
-  // Listen to proposals - simplified query without orderBy  
-  const proposalsQuery = query(
-    collection(db, "proposals"),
-    where("userId", "==", userId)
-  );
+  // Listen to proposals - simplified query without orderBy
+  const proposalsQuery = query(collection(db, "proposals"), where("userId", "==", userId));
 
   let contracts: Contract[] = [];
   let proposals: Proposal[] = [];
@@ -333,7 +290,7 @@ export function subscribeToVendorData(
       if (!a.createdAt || !b.createdAt) return 0;
       return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
     });
-    
+
     proposals.sort((a, b) => {
       if (!a.createdAt || !b.createdAt) return 0;
       return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
@@ -357,10 +314,10 @@ export function subscribeToVendorData(
         startDate: data.startDate || "",
         endDate: data.endDate || "",
         status: data.status || "pending",
-        createdAt: data.createdAt
+        createdAt: data.createdAt,
       };
 
-      if (contract.status === 'active' && contract.endDate) {
+      if (contract.status === "active" && contract.endDate) {
         const endDate = new Date(contract.endDate);
         const today = new Date();
         const diffTime = endDate.getTime() - today.getTime();
@@ -379,7 +336,7 @@ export function subscribeToVendorData(
     snapshot.forEach((doc) => {
       proposals.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       } as Proposal);
     });
     updateData();
@@ -410,13 +367,13 @@ export interface Milestone {
   description: string;
   targetDate: string;
   actualDate?: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'overdue';
+  status: "pending" | "in_progress" | "completed" | "overdue";
   progress: number;
 }
 
 export interface ContractNotification {
   id: string;
-  type: 'milestone' | 'deadline' | 'payment' | 'sla' | 'general';
+  type: "milestone" | "deadline" | "payment" | "sla" | "general";
   title: string;
   message: string;
   dueDate?: string;
@@ -424,57 +381,46 @@ export interface ContractNotification {
   createdAt: any;
 }
 
-// Get detailed contract information with milestones and progress
 export async function getContractDetails(contractId: string): Promise<ContractDetails | null> {
   try {
     console.log("[dashboard] Getting detailed contract:", contractId);
-    
-    const contractDoc = doc(db, 'contracts', contractId);
+
+    const contractDoc = doc(db, "contracts", contractId);
     const contractSnapshot = await getDoc(contractDoc);
-    
+
     if (!contractSnapshot.exists()) {
       console.log("[dashboard] Contract not found:", contractId);
       return null;
     }
-    
+
     const data = contractSnapshot.data();
-    
-    // Get milestones for this contract
-    const milestonesQuery = query(
-      collection(db, "contract_milestones"),
-      where("contractId", "==", contractId)
-    );
-    
+
+    const milestonesQuery = query(collection(db, "contract_milestones"), where("contractId", "==", contractId));
+
     const milestonesSnapshot = await getDocs(milestonesQuery);
     const milestones: Milestone[] = [];
-    
+
     milestonesSnapshot.forEach((doc) => {
       milestones.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       } as Milestone);
     });
 
     // Get contract notifications
-    const notificationsQuery = query(
-      collection(db, "contract_notifications"),
-      where("contractId", "==", contractId),
-      orderBy("createdAt", "desc"),
-      limit(10)
-    );
-    
+    const notificationsQuery = query(collection(db, "contract_notifications"), where("contractId", "==", contractId), orderBy("createdAt", "desc"), limit(10));
+
     const notificationsSnapshot = await getDocs(notificationsQuery);
     const notifications: ContractNotification[] = [];
-    
+
     notificationsSnapshot.forEach((doc) => {
       notifications.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       } as ContractNotification);
     });
 
-    // Calculate overall progress
-    const completedMilestones = milestones.filter(m => m.status === 'completed').length;
+    const completedMilestones = milestones.filter((m) => m.status === "completed").length;
     const totalMilestones = milestones.length;
     const progress = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
 
@@ -487,36 +433,26 @@ export async function getContractDetails(contractId: string): Promise<ContractDe
       endDate: data.endDate || "",
       status: data.status || "pending",
       createdAt: data.createdAt,
-      deliverables: data.deliverables || [
-        "Implementation of integrated logistics management system",
-        "Operational team training and maintenance", 
-        "Technical documentation and user manual",
-        "Support and maintenance for 12 months"
-      ],
+      deliverables: data.deliverables || ["Implementation of integrated logistics management system", "Operational team training and maintenance", "Technical documentation and user manual", "Support and maintenance for 12 months"],
       milestones,
       progress: Math.round(progress),
-      slaRequirements: data.slaRequirements || [
-        "System uptime minimum 99.5%",
-        "Response time maximum 24 hours",
-        "Monthly performance reports"
-      ],
+      slaRequirements: data.slaRequirements || ["System uptime minimum 99.5%", "Response time maximum 24 hours", "Monthly performance reports"],
       technicalSpec: data.technicalSpec || "",
       paymentTerms: data.paymentTerms || "",
-      notifications
+      notifications,
     };
 
     // Calculate days remaining if contract is active
-    if (contractDetails.status === 'active' && contractDetails.endDate) {
+    if (contractDetails.status === "active" && contractDetails.endDate) {
       const endDate = new Date(contractDetails.endDate);
       const today = new Date();
       const diffTime = endDate.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       contractDetails.daysRemaining = diffDays > 0 ? diffDays : 0;
     }
-    
+
     console.log("[dashboard] Contract details loaded:", contractDetails);
     return contractDetails;
-    
   } catch (error) {
     console.error("[dashboard] Error getting contract details:", error);
     return null;
@@ -526,7 +462,7 @@ export async function getContractDetails(contractId: string): Promise<ContractDe
 // Update contract progress
 export async function updateContractProgress(contractId: string, progress: number): Promise<boolean> {
   try {
-    const contractDoc = doc(db, 'contracts', contractId);
+    const contractDoc = doc(db, "contracts", contractId);
     await updateDoc(contractDoc, { progress });
     return true;
   } catch (error) {
@@ -535,14 +471,70 @@ export async function updateContractProgress(contractId: string, progress: numbe
   }
 }
 
-// Add milestone to contract
-export async function addContractMilestone(contractId: string, milestone: Omit<Milestone, 'id'>): Promise<string | null> {
+export async function updateContractStatus(contractId: string, status: string): Promise<boolean> {
   try {
-    const milestonesCollection = collection(db, 'contract_milestones');
+    const contractDoc = doc(db, "contracts", contractId);
+    const payload: any = {
+      status,
+      updatedAt: serverTimestamp(),
+    };
+
+    if (status === "active") {
+      payload.startDate = new Date().toISOString();
+    }
+
+    if (status === "expired" || status === "terminated") {
+      payload.endDate = new Date().toISOString();
+    }
+
+    await updateDoc(contractDoc, payload);
+    console.log("[dashboard] Updated contract status", contractId, status);
+    return true;
+  } catch (error) {
+    console.error("[dashboard] Error updating contract status:", error);
+    return false;
+  }
+}
+
+export async function markContractComplete(contractId: string): Promise<boolean> {
+  return updateContractStatus(contractId, "expired");
+}
+
+// Upload vendor signature image (dataURL) and attach to contract
+export async function uploadVendorSignature(contractId: string, dataUrl: string): Promise<string | null> {
+  try {
+    const timestamp = Date.now();
+    const path = `signatures/${contractId}_vendor_${timestamp}.png`;
+    const storageReference = storageRef(storage, path);
+
+    // uploadString with data_url
+    await uploadString(storageReference, dataUrl, "data_url");
+    const url = await getDownloadURL(storageReference);
+
+    // Update contract doc with signature metadata and set status active
+    const contractDoc = doc(db, "contracts", contractId);
+    await updateDoc(contractDoc, {
+      vendorSignatureUrl: url,
+      vendorSignedAt: serverTimestamp(),
+      status: "active",
+      updatedAt: serverTimestamp(),
+    });
+
+    console.log("[dashboard] Uploaded vendor signature and updated contract", contractId);
+    return url;
+  } catch (error) {
+    console.error("[dashboard] Error uploading vendor signature:", error);
+    return null;
+  }
+}
+
+export async function addContractMilestone(contractId: string, milestone: Omit<Milestone, "id">): Promise<string | null> {
+  try {
+    const milestonesCollection = collection(db, "contract_milestones");
     const docRef = await addDoc(milestonesCollection, {
       ...milestone,
       contractId,
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
     });
     return docRef.id;
   } catch (error) {
@@ -554,21 +546,18 @@ export async function addContractMilestone(contractId: string, milestone: Omit<M
 // Get contract milestones
 export async function getContractMilestones(contractId: string): Promise<Milestone[]> {
   try {
-    const milestonesQuery = query(
-      collection(db, "contract_milestones"),
-      where("contractId", "==", contractId)
-    );
-    
+    const milestonesQuery = query(collection(db, "contract_milestones"), where("contractId", "==", contractId));
+
     const querySnapshot = await getDocs(milestonesQuery);
     const milestones: Milestone[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       milestones.push({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       } as Milestone);
     });
-    
+
     return milestones;
   } catch (error) {
     console.error("[dashboard] Error fetching milestones:", error);
@@ -588,5 +577,5 @@ export default {
   getContractDetails,
   updateContractProgress,
   addContractMilestone,
-  getContractMilestones
+  getContractMilestones,
 };

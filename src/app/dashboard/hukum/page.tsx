@@ -29,17 +29,16 @@ const HukumDashboard = () => {
     const active = proposals.filter((p) => p.status === "approved" || p.status === "active").length;
 
     return [
-      { title: "Total Pengajuan", value: String(total), bgColor: colors.primary[100], iconColor: colors.primary[600] },
-      { title: "Draft/Pending", value: String(draft), bgColor: colors.base[100], iconColor: colors.base[600] },
-      { title: "In Review", value: String(review), bgColor: colors.warning[100], iconColor: colors.warning[600] },
-      { title: "Disetujui/Aktif", value: String(active), bgColor: colors.success[100], iconColor: colors.success[600] },
+      { title: "Total Pengajuan", value: String(total), bgColor: colors.primary[500], iconColor: colors.base[100] },
+      { title: "Draft/Pending", value: String(draft), bgColor: colors.base[500], iconColor: colors.base[100] },
+      { title: "In Review", value: String(review), bgColor: colors.error[300], iconColor: colors.base[100] },
+      { title: "Disetujui/Aktif", value: String(active), bgColor: colors.success[300], iconColor: colors.base[100] },
     ];
   }, [proposals]);
 
   const latest = proposals.slice(0, 6);
 
   const notifications = useMemo(() => {
-    // Create simple notifications based on statuses
     const notes: any[] = [];
     const waiting = proposals.filter((p) => p.status === "pending" || p.status === "under_review");
     if (waiting.length > 0) {
@@ -74,7 +73,6 @@ const HukumDashboard = () => {
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
             <div key={index} className="rounded-lg p-6 shadow-sm" style={{ backgroundColor: "#ffffff" }}>
@@ -100,7 +98,6 @@ const HukumDashboard = () => {
           ))}
         </div>
 
-        {/* Latest Proposals */}
         <div className="rounded-lg shadow-sm mb-8" style={{ backgroundColor: "#ffffff" }}>
           <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
             <div className="flex items-center justify-between">
@@ -124,8 +121,8 @@ const HukumDashboard = () => {
               <div key={p.id || index}>
                 <div className="p-6 flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.primary[100] }}>
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke={colors.primary[600]}>
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.primary[500] }}>
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke={colors.base[100]}>
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeWidth="2" />
                         <polyline points="14,2 14,8 20,8" strokeWidth="2" />
                       </svg>
@@ -164,7 +161,6 @@ const HukumDashboard = () => {
           </div>
         </div>
 
-        {/* Notifikasi & Pengingat */}
         <div className="rounded-lg shadow-sm" style={{ backgroundColor: "#ffffff" }}>
           <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
             <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>

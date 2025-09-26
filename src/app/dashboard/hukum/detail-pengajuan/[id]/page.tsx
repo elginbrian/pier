@@ -8,6 +8,9 @@ import { useAuth } from "@/context/AuthContext";
 import { getProposalById } from "@/services/proposals";
 import AiAnalysisPanel from "@/components/AiAnalysisPanel";
 import VendorInfoCard from "@/components/VendorInfoCard";
+import { useToasts } from "@/components/ToastProvider";
+import { FiCheck, FiSend, FiSave, FiX, FiAlertCircle } from "react-icons/fi";
+import { updateProposalStatus } from "@/services/proposals";
 
 const HukumDetailByIdPage: React.FC = () => {
   const params = useParams();
@@ -18,7 +21,9 @@ const HukumDetailByIdPage: React.FC = () => {
   const [proposal, setProposal] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // AI analysis is handled by a dedicated hook/component
+  const { showToast } = useToasts();
+  const [busy, setBusy] = useState(false);
+  const [confirmReject, setConfirmReject] = useState(false);
 
   useEffect(() => {
     const loadProposal = async () => {
@@ -42,8 +47,6 @@ const HukumDetailByIdPage: React.FC = () => {
 
     loadProposal();
   }, [id]);
-
-  // AI Analysis moved to `useAiAnalysis` and `AiAnalysisPanel` component
 
   if (loading) {
     return (
@@ -87,6 +90,7 @@ const HukumDetailByIdPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left/main column */}
           <div className="lg:col-span-2 space-y-6">
             <div className="rounded-lg p-6" style={{ backgroundColor: colors.primary[600] }}>
               <div className="flex items-center justify-between" style={{ color: "#ffffff" }}>
@@ -133,17 +137,15 @@ const HukumDetailByIdPage: React.FC = () => {
 
             <div className="bg-white rounded-lg shadow-sm">
               <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span style={{ color: colors.primary[300] }}>🤖</span>
-                    <div>
-                      <h3 className="font-semibold" style={{ color: colors.base[700] }}>
-                        Draft Kontrak Otomatis
-                      </h3>
-                      <p className="text-sm" style={{ color: colors.base[500] }}>
-                        (AI Generated)
-                      </p>
-                    </div>
+                <div className="flex items-center space-x-2">
+                  <span style={{ color: colors.primary[300] }}>🤖</span>
+                  <div>
+                    <h3 className="font-semibold" style={{ color: colors.base[700] }}>
+                      Draft Kontrak Otomatis
+                    </h3>
+                    <p className="text-sm" style={{ color: colors.base[500] }}>
+                      (AI Generated)
+                    </p>
                   </div>
                 </div>
               </div>
@@ -167,6 +169,7 @@ const HukumDetailByIdPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Right sidebar */}
           <div className="space-y-6">
             <VendorInfoCard proposal={proposal} />
 
@@ -198,46 +201,127 @@ const HukumDetailByIdPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <span style={{ color: colors.success[300] }}>✅</span>
-                <h3 className="font-semibold" style={{ color: colors.base[700] }}>
-                  Review & Komentar
-                </h3>
-              </div>
-
-              <div className="mb-6">
-                <h4 className="font-medium mb-3" style={{ color: colors.base[700] }}>
-                  Checklist Review
-                </h4>
-                <div className="space-y-2">
-                  <p className="text-sm">- Informasi vendor</p>
-                  <p className="text-sm">- Ruang lingkup</p>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div style={{ backgroundColor: colors.primary[100] }} className="px-6 py-3">
+                <div className="flex items-center space-x-2">
+                  <span style={{ color: colors.primary[400] }}>✅</span>
+                  <h3 className="font-semibold" style={{ color: colors.base[700] }}>
+                    Review & Komentar
+                  </h3>
                 </div>
               </div>
+              <div className="p-6">
+                <div className="mb-6">
+                  <h4 className="font-medium mb-3" style={{ color: colors.base[700] }}>
+                    Checklist Review
+                  </h4>
+                  <div className="space-y-2">
+                    <p className="text-sm">- Informasi vendor</p>
+                    <p className="text-sm">- Ruang lingkup</p>
+                  </div>
+                </div>
 
-              <div className="space-y-3">
-                <button className="w-full py-3 rounded-lg font-medium text-white transition-colors" style={{ backgroundColor: colors.success[300] }}>
-                  ✅ Terima Draft
-                </button>
-                <button className="w-full py-3 rounded-lg font-medium text-white transition-colors" style={{ backgroundColor: colors.warning[300] }}>
-                  📤 Kirim Revisi ke Vendor
-                </button>
-                <button
-                  className="w-full py-3 rounded-lg font-medium transition-colors"
-                  style={{
-                    backgroundColor: colors.base[100],
-                    color: colors.base[600],
-                    border: `1px solid ${colors.base[300]}`,
-                  }}
-                >
-                  💾 Simpan Draft
-                </button>
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <button
+                      onClick={async () => {
+                        if (!user) return;
+                        setBusy(true);
+                        try {
+                          await updateProposalStatus(proposal.id, "approved", user.uid, null);
+                          showToast("success", "Proposal disetujui");
+                        } catch (e) {
+                          console.error(e);
+                          showToast("error", "Gagal menyetujui proposal");
+                        } finally {
+                          setBusy(false);
+                        }
+                      }}
+                      disabled={busy}
+                      className="w-full py-3 rounded-lg font-medium text-white flex items-center justify-center gap-2 shadow-sm"
+                      style={{ backgroundColor: colors.primary[400] }}
+                    >
+                      <FiCheck /> <span>Terima Draft</span>
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        showToast("info", "Permintaan revisi dikirim ke vendor");
+                      }}
+                      className="w-full py-3 rounded-lg font-medium text-white flex items-center justify-center gap-2 shadow-sm"
+                      style={{ backgroundColor: colors.secondary[300] }}
+                    >
+                      <FiSend /> <span>Kirim Revisi ke Vendor</span>
+                    </button>
+
+                    <button
+                      onClick={() => showToast("info", "Draft disimpan")}
+                      className="w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2"
+                      style={{
+                        backgroundColor: colors.base[100],
+                        color: colors.base[600],
+                        border: `1px solid ${colors.base[300]}`,
+                      }}
+                    >
+                      <FiSave /> <span>Simpan Draft</span>
+                    </button>
+
+                    <div className="mt-2">
+                      <button
+                        onClick={() => setConfirmReject(true)}
+                        className="w-full py-2 rounded-lg font-medium flex items-center justify-center gap-2"
+                        style={{ backgroundColor: "transparent", color: colors.error[700], border: `1px solid ${colors.error[300]}` }}
+                      >
+                        <FiX /> <span>Tolak Proposal</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {confirmReject && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <div className="flex items-start space-x-3">
+              <FiAlertCircle size={22} className="text-yellow-500" />
+              <div>
+                <h3 className="font-semibold">Konfirmasi Tolak Proposal</h3>
+                <p className="text-sm text-gray-600">Apakah Anda yakin ingin menolak proposal ini? Tindakan ini tidak dapat diurungkan.</p>
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-end gap-2">
+              <button onClick={() => setConfirmReject(false)} className="px-3 py-2 rounded" style={{ border: `1px solid ${colors.base[300]}` }}>
+                Batal
+              </button>
+              <button
+                onClick={async () => {
+                  if (!user) return;
+                  setBusy(true);
+                  try {
+                    await updateProposalStatus(proposal.id, "rejected", user.uid, "Ditolak oleh tim hukum");
+                    showToast("success", "Proposal ditolak");
+                    setConfirmReject(false);
+                  } catch (e) {
+                    console.error(e);
+                    showToast("error", "Gagal menolak proposal");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                className="px-3 py-2 rounded text-white"
+                style={{ backgroundColor: colors.error[600] }}
+              >
+                Tolak
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

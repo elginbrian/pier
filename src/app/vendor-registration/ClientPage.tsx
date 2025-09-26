@@ -229,7 +229,7 @@ export default function ClientVendorRegistrationPage() {
           </h3>
 
           <div className="bg-white rounded-lg p-8 shadow-sm border">
-            <div className="space-y-6">
+            <div className="">
               <FileUploadField
                 label="Administrative Document"
                 fieldName="dokumen-admin"

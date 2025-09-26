@@ -50,12 +50,9 @@ const FormSendSuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop Overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onClick={handleClose} />
+      <div className="absolute inset-0 transition-opacity" style={{ backgroundColor: "rgba(0,0,0,0.12)", backdropFilter: "blur(6px)" }} onClick={handleClose} />
 
-      {/* Modal Container */}
       <div className={`relative bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 ease-out max-w-lg w-full mx-4 ${isVisible ? "translate-y-0 opacity-100 scale-100" : "translate-y-4 opacity-0 scale-95"}`}>
-        {/* Progress Bar */}
         {autoClose && (
           <div
             className="h-1 bg-gradient-to-r from-blue-400 to-blue-600"
@@ -65,12 +62,10 @@ const FormSendSuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, on
           />
         )}
 
-        {/* Header */}
         <div className="px-6 py-4 text-center text-white rounded-t-xl" style={{ backgroundColor: "#1e40af" }}>
           <h4 className="text-xl font-semibold">Form Submitted</h4>
         </div>
 
-        {/* Content */}
         <div className="px-6 py-6 text-center">
           <div className="mb-6">
             <Image src="/send-form-success.png" alt="Form Success" width={120} height={120} className="mx-auto rounded-lg" />
@@ -83,7 +78,6 @@ const FormSendSuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, on
               Please check your email (including Spam) within a few hours. You will receive your account details (email and password) or feedback if there are issues during verification.
             </p>
 
-            {/* Info Box */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-left">
               <div className="flex items-start">
                 <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
@@ -95,7 +89,6 @@ const FormSendSuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, on
               </div>
             </div>
 
-            {/* Warning Box */}
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-left">
               <div className="flex items-start">
                 <div className="w-5 h-5 rounded-full bg-yellow-100 flex items-center justify-center mt-0.5 mr-3 flex-shrink-0">
@@ -111,7 +104,7 @@ const FormSendSuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, on
               </div>
             </div>
 
-            <Button variant="primary" size="md" onClick={handleLogin} className="w-full mt-6" style={{ backgroundColor: "#1e40af" }}>
+            <Button variant="primary" size="md" onClick={handleLogin} className="w-full mt-6" style={{ backgroundColor: "#1e40af", color: "#ffffff" }}>
               Login
             </Button>
           </div>

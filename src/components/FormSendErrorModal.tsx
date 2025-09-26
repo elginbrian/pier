@@ -62,8 +62,7 @@ const FormSendErrorModal: React.FC<ErrorModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop Overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity" onClick={handleClose} />
+      <div className="absolute inset-0 transition-opacity" style={{ backgroundColor: "rgba(0,0,0,0.18)", backdropFilter: "blur(6px)" }} onClick={handleClose} />
 
       {/* Modal Container */}
       <div className={`relative bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 ease-out max-w-lg w-full mx-4 ${isVisible ? "translate-y-0 opacity-100 scale-100" : "translate-y-4 opacity-0 scale-95"}`}>
@@ -109,7 +108,7 @@ const FormSendErrorModal: React.FC<ErrorModalProps> = ({
               </div>
             )}
 
-            <Button variant="primary" size="md" onClick={handleRetry || handleClose} className="w-full mt-6" style={{ backgroundColor: "#dc2626" }}>
+            <Button variant="primary" size="md" onClick={handleRetry || handleClose} className="w-full mt-6" style={{ backgroundColor: "#dc2626", color: "#ffffff" }}>
               Try Again
             </Button>
           </div>

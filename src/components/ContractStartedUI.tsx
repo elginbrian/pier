@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getContractDetails, ContractDetails } from '@/services/dashboard';
-
-// --- SVG Icon Components ---
-// These are included directly in the file to maintain the single-file structure.
+import React, { useState, useEffect } from "react";
+import { getContractDetails, ContractDetails, markContractComplete } from "@/services/dashboard";
 
 const CalendarIcon = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -21,14 +18,13 @@ const ClockIcon = ({ className }: { className?: string }) => (
 );
 
 const DeliverablesIcon = ({ className }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <path d="M15 6H3l-1 5 1 5h12l1-5-1-5z" />
-        <path d="M3 11h13" />
-        <path d="M19.5 9.5 21 11l-1.5 1.5" />
-        <path d="m17 14 1.5 1.5-1.5 1.5" />
-    </svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M15 6H3l-1 5 1 5h12l1-5-1-5z" />
+    <path d="M3 11h13" />
+    <path d="M19.5 9.5 21 11l-1.5 1.5" />
+    <path d="m17 14 1.5 1.5-1.5 1.5" />
+  </svg>
 );
-
 
 const BellIcon = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -63,7 +59,6 @@ const SlaIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-
 // --- Main Component ---
 interface ContractStartedUIProps {
   contractId: string;
@@ -79,7 +74,7 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
       try {
         setLoading(true);
         console.log("[ContractStartedUI] Fetching contract details:", contractId);
-        
+
         const details = await getContractDetails(contractId);
         if (details) {
           setContractDetails(details);
@@ -117,9 +112,7 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
     return (
       <div className="bg-slate-50 font-sans p-4 sm:p-6 lg:p-8 min-h-screen">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-            Error: {error || "Contract not found"}
-          </div>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">Error: {error || "Contract not found"}</div>
         </div>
       </div>
     );
@@ -128,10 +121,10 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
   const formatDate = (dateString: string) => {
     if (!dateString) return "Not specified";
     const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long', 
-      year: 'numeric'
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
     });
   };
 
@@ -148,28 +141,25 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
     {
       icon: <DocumentIcon className="w-8 h-8 text-blue-400" />,
       title: "Contract Document",
-      subtitle: "View complete contract"
+      subtitle: "View complete contract",
     },
     {
       icon: <MilestoneIcon className="w-8 h-8 text-orange-400" />,
       title: "Milestone",
-      subtitle: "Track achievements"
+      subtitle: "Track achievements",
     },
     {
       icon: <SlaIcon className="w-8 h-8 text-green-400" />,
       title: "Monitoring SLA",
-      subtitle: "Monitor performance"
-    }
+      subtitle: "Monitor performance",
+    },
   ];
   return (
     <div className="bg-slate-50 font-sans p-4 sm:p-6 lg:p-8 min-h-screen">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
         {/* Main Content */}
         <div className="lg:col-span-2 bg-white p-6 sm:p-8 rounded-2xl shadow-sm">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6">
-            {contractDetails.title}
-          </h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6">{contractDetails.title}</h1>
 
           {/* Date & Duration Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
@@ -193,6 +183,24 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
             </div>
           </div>
 
+          {/* Action buttons for started contract */}
+          <div className="mt-6 flex gap-3">
+            <button
+              onClick={async () => {
+                if (!contractDetails) return;
+                const ok = await markContractComplete(contractDetails.id);
+                if (ok) window.location.reload();
+                else alert("Gagal menandai kontrak selesai");
+              }}
+              className="bg-green-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-green-700"
+            >
+              Tandai Selesai (Selesaikan Kontrak)
+            </button>
+            <button onClick={() => window.location.reload()} className="bg-gray-100 px-4 py-2 rounded-md font-semibold hover:bg-gray-200">
+              Refresh
+            </button>
+          </div>
+
           {/* Contract Value and Days Remaining */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
             <div className="bg-green-50 border border-green-100 rounded-xl p-4">
@@ -210,8 +218,8 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
           {/* Main Deliverables */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-slate-800 mb-4 flex items-center">
-                <DeliverablesIcon className="w-6 h-6 text-slate-500 mr-3"/>
-                Main Deliverables
+              <DeliverablesIcon className="w-6 h-6 text-slate-500 mr-3" />
+              Main Deliverables
             </h2>
             <ul className="space-y-3">
               {contractDetails.deliverables.map((item, index) => (
@@ -222,7 +230,7 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
               ))}
             </ul>
           </div>
-          
+
           {/* Automatic Notification */}
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-start mb-8">
             <div className="flex-shrink-0 mr-4">
@@ -236,16 +244,14 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
 
           {/* Progress Timeline */}
           <div>
-            <h2 className="text-xl font-semibold text-slate-800 mb-3">
-                Contract Progress Timeline
-            </h2>
+            <h2 className="text-xl font-semibold text-slate-800 mb-3">Contract Progress Timeline</h2>
             <div className="w-full bg-slate-200 rounded-full h-2.5 mb-2">
               <div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${contractDetails.progress}%` }}></div>
             </div>
             <div className="flex justify-between text-sm">
               <p className="font-medium text-slate-600">{contractDetails.progress}% Complete</p>
               <p className="text-slate-500">
-                {contractDetails.milestones.filter(m => m.status === 'completed').length} of {contractDetails.milestones.length} milestones completed
+                {contractDetails.milestones.filter((m) => m.status === "completed").length} of {contractDetails.milestones.length} milestones completed
               </p>
             </div>
           </div>
@@ -253,35 +259,33 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
 
         {/* Quick Actions Sidebar */}
         <div className="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-sm h-fit">
-            <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
-            <div className="space-y-4">
-                {quickActions.map((action, index) => (
-                    <div key={index} className="bg-slate-700 hover:bg-slate-600 transition-colors duration-200 rounded-xl p-4 flex items-center cursor-pointer">
-                        <div className="bg-slate-800 p-3 rounded-lg mr-4">
-                           {action.icon}
-                        </div>
-                        <div>
-                            <p className="font-semibold text-white">{action.title}</p>
-                            <p className="text-sm text-slate-300">{action.subtitle}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Recent Notifications */}
-            {contractDetails.notifications.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-lg font-semibold text-white mb-4">Recent Updates</h3>
-                <div className="space-y-3">
-                  {contractDetails.notifications.slice(0, 3).map((notification) => (
-                    <div key={notification.id} className="bg-slate-700 rounded-lg p-3">
-                      <p className="text-white text-sm font-medium">{notification.title}</p>
-                      <p className="text-slate-300 text-xs mt-1">{notification.message}</p>
-                    </div>
-                  ))}
+          <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
+          <div className="space-y-4">
+            {quickActions.map((action, index) => (
+              <div key={index} className="bg-slate-700 hover:bg-slate-600 transition-colors duration-200 rounded-xl p-4 flex items-center cursor-pointer">
+                <div className="bg-slate-800 p-3 rounded-lg mr-4">{action.icon}</div>
+                <div>
+                  <p className="font-semibold text-white">{action.title}</p>
+                  <p className="text-sm text-slate-300">{action.subtitle}</p>
                 </div>
               </div>
-            )}
+            ))}
+          </div>
+
+          {/* Recent Notifications */}
+          {contractDetails.notifications.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold text-white mb-4">Recent Updates</h3>
+              <div className="space-y-3">
+                {contractDetails.notifications.slice(0, 3).map((notification) => (
+                  <div key={notification.id} className="bg-slate-700 rounded-lg p-3">
+                    <p className="text-white text-sm font-medium">{notification.title}</p>
+                    <p className="text-slate-300 text-xs mt-1">{notification.message}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
