@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { useToasts } from "../../../components/ToastProvider";
+import Input from "../../../components/Input";
+import Button from "../../../components/Button";
+import { FiMail } from "react-icons/fi";
 
 export default function ForgotPasswordPage() {
   const { requestPasswordReset } = useAuth();
@@ -38,25 +41,15 @@ export default function ForgotPasswordPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-10">
             <div className="flex flex-col items-center gap-4 mb-6">
               <Image src="/logo-pelindo.png" alt="PIER logo" width={120} height={36} />
-              <h1 className="text-3xl font-semibold text-[color:var(--pier-primary-700)]">LUPA PASSWORD</h1>
+              <h1 className="text-3xl font-bold text-[color:var(--pier-primary-700)]">LUPA PASSWORD</h1>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <label className="block text-sm text-gray-700">
-                Email
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-2 block w-full rounded-md border border-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[color:var(--pier-accentCool-300)]"
-                  placeholder="Masukkan email terdaftar"
-                  type="email"
-                  name="email"
-                />
-              </label>
+              <Input label="Email" placeholder="Masukkan email terdaftar" type="email" value={email} onChange={(e) => setEmail(e.target.value)} leftIcon={<FiMail />} />
 
-              <button disabled={loading} type="submit" className="w-full bg-[color:var(--pier-primary-700)] text-white py-3 rounded-md font-medium hover:brightness-95">
+              <Button type="submit" disabled={loading} className="w-full bg-[color:var(--pier-primary-700)] text-white py-3 rounded-md font-medium hover:brightness-95">
                 {loading ? "Mengirim..." : "Kirim Reset Link"}
-              </button>
+              </Button>
             </form>
 
             <p className="text-center text-sm text-gray-600 mt-6">
