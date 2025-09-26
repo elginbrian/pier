@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 // --- TypeScript Interfaces ---
 interface IconProps {
@@ -30,13 +33,30 @@ const DownloadIcon: React.FC<IconProps> = ({ className }) => (
     </svg>
 );
 
+const ArrowLeftIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M19 12H6" /><path d="l-6-6 6 6-6 6" />
+    </svg>
+);
+
 // --- Main Component ---
 const ManagementContractActiveDetailsPage: React.FC = () => {
+    const searchParams = useSearchParams();
+    const contractId = searchParams.get('id') || 'KTR-001';
+
+    // Mock data - in real app, fetch based on contractId
+    const contractData = {
+        id: contractId,
+        company: "PT Digital Solutions Indonesia",
+        type: "Service & Maintenance Provider",
+        value: "Rp 2.500.000.000",
+        period: "01 Jan 2024 - 31 Des 2024",
+        contractType: "Service & Maintenance"
+    };
 
     return (
-        <div className="bg-slate-100 font-sans p-4 sm:p-6 lg:p-8 min-h-screen text-slate-800">
+        <div className="font-sans p-4 sm:p-6 lg:p-8 min-h-screen text-slate-800">
             <div className="max-w-7xl mx-auto">
-                
                 {/* Header Section */}
                 <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
                     <div className="flex flex-wrap justify-between items-start gap-4">
@@ -45,28 +65,28 @@ const ManagementContractActiveDetailsPage: React.FC = () => {
                                 <BuildingIcon className="w-8 h-8 text-indigo-600" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold">PT Teknologi Maju Bersama</h1>
-                                <p className="text-slate-500">Vendor IT Infrastructure</p>
+                                <h1 className="text-2xl font-bold">{contractData.company}</h1>
+                                <p className="text-slate-500">{contractData.type}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-yellow-800 bg-yellow-100 px-4 py-1.5 rounded-full">Final Draft</span>
-                            <span className="text-sm font-semibold text-orange-800 bg-orange-100 px-4 py-1.5 rounded-full">Pending Approval</span>
+                            <span className="text-sm font-semibold text-green-800 bg-green-100 px-4 py-1.5 rounded-full">Kontrak Aktif</span>
+                            <span className="text-sm font-semibold text-blue-800 bg-blue-100 px-4 py-1.5 rounded-full">Berjalan Normal</span>
                         </div>
                     </div>
                     <hr className="my-6 border-slate-200" />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
                         <div>
                             <p className="text-sm text-slate-500 mb-1">Nilai Kontrak</p>
-                            <p className="text-2xl font-bold">Rp 2.750.000.000</p>
+                            <p className="text-2xl font-bold">{contractData.value}</p>
                         </div>
                         <div>
                             <p className="text-sm text-slate-500 mb-1">Periode Kontrak</p>
-                            <p className="text-lg font-semibold">1 Jan 2024 - 31 Des 2024</p>
+                            <p className="text-lg font-semibold">{contractData.period}</p>
                         </div>
                         <div>
                             <p className="text-sm text-slate-500 mb-1">Jenis Kontrak</p>
-                            <p className="text-lg font-semibold">Service & Maintenance</p>
+                            <p className="text-lg font-semibold">{contractData.contractType}</p>
                         </div>
                     </div>
                 </div>
