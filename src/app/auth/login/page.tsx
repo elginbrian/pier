@@ -19,7 +19,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   if (user) {
-    router.replace("/");
+    const destination = user.role === "hukum" ? "/dashboard/hukum" : "/dashboard/vendor";
+    router.replace(destination);
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,9 +32,11 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      await signIn(identifier, password);
+      const u = await signIn(identifier, password);
       showToast("success", "Successfully signed in");
-      router.push("/");
+
+      const dest = u?.role === "hukum" ? "/dashboard/hukum" : "/dashboard/vendor";
+      router.push(dest);
     } catch (err: any) {
       const msg = err?.message || "Failed to sign in";
       setError(msg);

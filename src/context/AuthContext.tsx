@@ -5,11 +5,13 @@ import * as authService from "../services/auth";
 import { app } from "../firebase/init";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
+export type AppUser = authService.User & { role?: string | null };
+
 type AuthContextValue = {
-  user: authService.User | null;
+  user: AppUser | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<authService.User>;
-  signIn: (email: string, password: string) => Promise<authService.User>;
+  signUp: (email: string, password: string) => Promise<AppUser>;
+  signIn: (email: string, password: string) => Promise<AppUser>;
   signOut: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
 };
@@ -17,7 +19,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<authService.User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,35 +38,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
           });
+          return { role: "vendor" };
         }
+        return { role: snap.data()?.role ?? null };
       } catch (e) {
-        console.error("Failed to ensure user doc in firestore", e);
+        console.error("Failed to ensure/load user doc in firestore", e);
+        return { role: null };
       }
     }
 
-    const unsubscribe = authService.onAuthStateChanged((u) => {
-      setUser(u);
-      setLoading(false);
-      if (u) {
-        ensureUserDoc(u as authService.User);
+    const unsubscribe = authService.onAuthStateChanged(async (u) => {
+      setLoading(true);
+      if (!u) {
+        setUser(null);
+        setLoading(false);
+        return;
       }
+
+      const { role } = await ensureUserDoc(u as authService.User);
+      setUser({ ...(u as authService.User), role });
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
+
+  async function loadRoleForUid(uid: string) {
+    try {
+      const db = getFirestore(app);
+      const userRef = doc(db, "users", uid);
+      const snap = await getDoc(userRef);
+      return snap.exists() ? snap.data()?.role ?? null : null;
+    } catch (e) {
+      console.error("Failed to load user role", e);
+      return null;
+    }
+  }
 
   const value: AuthContextValue = {
     user,
     loading,
     signUp: async (email: string, password: string) => {
       const u = await authService.signUpWithEmail(email, password);
-      setUser(u);
-      return u;
+
+      const role = await loadRoleForUid(u.uid);
+      const appUser: AppUser = { ...u, role };
+      setUser(appUser);
+      return appUser;
     },
     signIn: async (email: string, password: string) => {
       const u = await authService.signInWithEmailLocal(email, password);
-      setUser(u);
-      return u;
+      const role = await loadRoleForUid(u.uid);
+      const appUser: AppUser = { ...u, role };
+      setUser(appUser);
+      return appUser;
     },
     signOut: async () => {
       await authService.signOut();

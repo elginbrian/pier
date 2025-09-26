@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { colors } from "../design-system";
 import { FiBarChart2, FiFileText, FiList, FiX } from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
 
 interface SidebarProps {
   className?: string;
@@ -14,12 +15,16 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ className = "", onClose }) => {
   const pathname = usePathname() || "/";
 
+  const { user } = useAuth();
+
+  const dashboardHref = user ? (user.role === "hukum" ? "/dashboard/hukum" : "/dashboard/vendor") : "/auth/login";
+  const secondHref = user ? (user.role === "hukum" ? "/dashboard/hukum/detail-pengajuan" : "/dashboard/vendor/proposal") : "/auth/login";
+
   const navItems: { href: string; label: string; icon: React.ReactNode }[] = [
-    { href: "/dashboard", label: "Dashboard", icon: <FiBarChart2 size={18} /> },
-    { href: "/dashboard/proposal", label: "Proposal", icon: <FiFileText size={18} /> },
+    { href: dashboardHref, label: "Dashboard", icon: <FiBarChart2 size={18} /> },
+    { href: secondHref, label: user?.role === "hukum" ? "Detail Pengajuan" : "Proposal", icon: <FiFileText size={18} /> },
   ];
 
-  // When onClose is provided (drawer mode), show on mobile; otherwise keep fixed on md+
   const rootClass = onClose ? `block md:hidden ${className}` : `hidden md:block fixed left-0 top-0 bottom-0 z-40 ${className}`;
 
   return (
