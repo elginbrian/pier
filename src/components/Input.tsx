@@ -13,7 +13,7 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size">
   /** Right icon element */
   rightIcon?: React.ReactNode;
   /** Input label */
-  label?: string;
+  label?: React.ReactNode;
   /** Error message */
   error?: string;
   /** Help text */

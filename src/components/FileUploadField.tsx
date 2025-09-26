@@ -2,7 +2,7 @@ import React from "react";
 import { colors } from "../design-system";
 
 interface FileUploadFieldProps {
-  label: string;
+  label: React.ReactNode;
   fieldName: string;
   fieldKey: string;
   file: File | null;
