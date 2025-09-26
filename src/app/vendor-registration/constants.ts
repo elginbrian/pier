@@ -1,14 +1,8 @@
 // Data constants for vendor registration
 export const VENDOR_TYPES = [
-  "Logistics Service Provider",
-  "Goods Supplier",
-  "Construction Service Provider",
-  "Consulting Service Provider",
-  "Maintenance Service Provider",
-  "IT Service Provider",
-  "Cleaning Service Provider",
-  "Security Service Provider",
-  "Other",
+  "Vendor",
+  "Procurement of services",
+  "Procurement of goods"
 ];
 
 export const DOCUMENT_SECTIONS = [

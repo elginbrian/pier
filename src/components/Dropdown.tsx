@@ -20,9 +20,9 @@ const Dropdown = ({ label = "Menu Label", options = ["Label1", "Label2", "Label3
       {/* Dropdown Button */}
       <button
         onClick={toggleDropdown}
-        className={`w-full px-4 py-3 bg-white border-2 flex items-center justify-between text-left hover:bg-gray-50 focus:outline-none focus:ring-2 transition-colors ${error ? "border-red-500" : "border-blue-500"} ${
-          isOpen ? "rounded-t-lg" : "rounded-lg"
-        }`}
+        className={`w-full px-4 py-3 bg-white border-2 flex items-center justify-between text-left hover:bg-gray-50 focus:outline-none focus:ring-2 transition-colors ${
+          error ? "border-red-500" : isOpen ? "border-blue-500" : "border-gray-300"
+        } ${isOpen ? "rounded-t-lg" : "rounded-lg"}`}
         style={{
           fontFamily: "Plus Jakarta Sans, sans-serif",
           fontWeight: "600",
