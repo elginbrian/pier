@@ -162,13 +162,7 @@ export default function ClientVendorRegistrationPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {DOCUMENT_PREVIEWS.map((doc, index) => (
-              <DocumentPreviewCard 
-                key={index} 
-                title={doc.title} 
-                filename={doc.filename} 
-                preview={doc.preview}
-                downloadUrl={doc.downloadUrl}
-              />
+              <DocumentPreviewCard key={index} title={doc.title} filename={doc.filename} preview={doc.preview} downloadUrl={doc.downloadUrl} />
             ))}
           </div>
         </div>
@@ -231,7 +225,7 @@ export default function ClientVendorRegistrationPage() {
             Upload Documents
           </h3>
 
-          <div className="">
+          <div className="space-y-4">
             <FileUploadField
               label={<span className="font-bold">Administrative Document</span>}
               fieldName="dokumen-admin"
