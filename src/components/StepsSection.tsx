@@ -1,9 +1,11 @@
 import React from "react";
 import Image from "next/image";
 import Button from "./Button";
+import { useRouter } from "next/navigation";
 import { colors } from "../design-system";
 
 export default function StepsSection() {
+  const router = useRouter();
   const steps = [
     { title: "Registration", desc: 'Register as a vendor by clicking the "Get Started" button next to it', img: "/step-1.png" },
     { title: "Fill Online Form", desc: "Complete the registration form by providing the requested information", img: "/step-2.png" },
@@ -23,7 +25,7 @@ export default function StepsSection() {
           </p>
 
           <div className="w-48">
-            <Button variant="primary" size="md" className="w-full">
+            <Button variant="primary" size="md" className="w-full" onClick={() => router.push("/dashboard/proposal/create")}>
               Create Contract
             </Button>
           </div>

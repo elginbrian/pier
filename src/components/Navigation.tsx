@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Button from "./Button";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 
 interface NavigationProps {
@@ -13,6 +13,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = "" }) => {
   const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
   const { user, signOut } = useAuth();
+  const pathname = usePathname();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = "" }) => {
             <img src="/logo-pelindo.png" alt="Pelindo Logo" className="h-8 w-auto" />
           </div>
 
-          <div className="flex-1 max-w-xl mx-6">
+          {/* <div className="flex-1 max-w-xl mx-6">
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
@@ -42,22 +43,33 @@ const Navigation: React.FC<NavigationProps> = ({ className = "" }) => {
                 </svg>
               </button>
             </form>
-          </div>
+          </div> */}
 
           <div className="hidden md:block">
             <div className="ml-6 flex items-baseline space-x-6">
-              <a href="#" className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
+              <button onClick={() => router.push("/")} className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
                 Home
-              </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
-                Features
-              </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
+              </button>
+
+              <button
+                onClick={() => {
+                  if (pathname === "/") {
+                    const el = document.getElementById("about");
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  } else {
+                    router.push("/#about");
+                  }
+                }}
+                className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors"
+              >
                 About
-              </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
-                Contact
-              </a>
+              </button>
+
+              <button onClick={() => router.push("/vendor-registration")} className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
+                Vendor Registration
+              </button>
             </div>
           </div>
 

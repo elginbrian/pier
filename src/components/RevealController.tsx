@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function RevealController() {
+  const pathname = usePathname();
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -47,7 +50,8 @@ export default function RevealController() {
       observer.disconnect();
       clearTimeout(safety);
     };
-  }, []);
+    // Re-run when the pathname changes so animations run on client-side navigation
+  }, [pathname]);
 
   return null;
 }

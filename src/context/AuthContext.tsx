@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as authService from "../services/auth";
+import { app } from "../firebase/init";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 type AuthContextValue = {
   user: authService.User | null;
@@ -19,10 +21,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const db = getFirestore(app);
+
+    async function ensureUserDoc(u: authService.User) {
+      try {
+        const userRef = doc(db, "users", u.uid);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) {
+          await setDoc(userRef, {
+            uid: u.uid,
+            email: u.email ?? null,
+            displayName: u.displayName ?? null,
+            role: "vendor",
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+        }
+      } catch (e) {
+        console.error("Failed to ensure user doc in firestore", e);
+      }
+    }
+
     const unsubscribe = authService.onAuthStateChanged((u) => {
       setUser(u);
       setLoading(false);
+      if (u) {
+        ensureUserDoc(u as authService.User);
+      }
     });
+
     return () => unsubscribe();
   }, []);
 
