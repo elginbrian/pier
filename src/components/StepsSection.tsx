@@ -15,10 +15,10 @@ export default function StepsSection() {
     <section className="py-20">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         <div>
-          <h2 className="text-4xl font-extrabold mb-6" style={{ color: colors.base[700] }}>
+          <h2 className="text-4xl font-extrabold mb-6 reveal-from-left" style={{ color: colors.base[700] }}>
             Langkah-Langkah Membuat Kontrak Bersama <span style={{ color: colors.primary[300] }}>PIER</span>
           </h2>
-          <p className="mb-6" style={{ color: colors.base[500] }}>
+          <p className="mb-6 reveal-from-bottom" style={{ color: colors.base[500] }}>
             PIER adalah platform manajemen kontrak berbasis AI yang digunakan PT ILCS untuk mempermudah pengelolaan seluruh siklus hidup kontrak, mulai dari pendaftaran vendor, pengajuan proposal, drafting kontrak, hingga monitoring kontrak
             secara real-time.
           </p>
@@ -31,7 +31,7 @@ export default function StepsSection() {
         </div>
 
         <div className="relative">
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 stagger reveal-from-bottom">
             {steps.map((s, i) => (
               <div key={i} className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-12 text-3xl font-semibold text-gray-700">{String(i + 1).padStart(2, "0")}</div>

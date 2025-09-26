@@ -4,14 +4,14 @@ import { FiFileText, FiGlobe, FiServer } from "react-icons/fi";
 
 export default function WhyChooseUs() {
   return (
-    <section style={{ backgroundColor: colors.primary[300] }} className="py-20">
+    <section style={{ backgroundColor: colors.primary[300] }} className="py-20 reveal-from-bottom">
       <div className="max-w-7xl mx-auto px-6">
-        <h3 className="text-3xl sm:text-4xl font-extrabold text-center text-white mb-4">Kenapa memilih kami?</h3>
-        <p className="text-center text-white/90 max-w-3xl mx-auto mb-10">
+        <h3 className="text-3xl sm:text-4xl font-extrabold text-center text-white mb-4 reveal-from-bottom">Kenapa memilih kami?</h3>
+        <p className="text-center text-white/90 max-w-3xl mx-auto mb-10 reveal-from-bottom">
           Keunggulan Kami untuk Industri Anda Kami memahami kompleksitas dalam mengelola dokumen dan perjanjian di sektor logistik. Platform kami dirancang khusus untuk memecahkan masalah ini dengan:
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 why-grid">
           {[
             {
               title: "Kompetensi Solusi Digital Pelabuhan & Logistik",
@@ -31,7 +31,7 @@ export default function WhyChooseUs() {
           ].map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div key={idx} className="rounded-lg p-6 shadow-md" style={{ backgroundColor: colors.base[100] }}>
+              <div key={idx} className="rounded-lg p-6 shadow-md reveal-from-bottom" style={{ backgroundColor: colors.base[100] }}>
                 <div className="w-12 h-12 rounded-md flex items-center justify-center mb-4" style={{ backgroundColor: colors.secondary[300] }}>
                   <Icon size={20} color="white" aria-hidden />
                 </div>

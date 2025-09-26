@@ -4,6 +4,7 @@ import "./globals.css";
 import { toCssVariables } from "../design-system";
 import AuthProviderClient from "../context/AuthProviderClient";
 import { ToastProvider } from "../components/ToastProvider";
+import RevealController from "../components/RevealController";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -26,7 +27,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className={`${plusJakarta.variable} antialiased`}>
         <AuthProviderClient>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <RevealController />
+            {children}
+          </ToastProvider>
         </AuthProviderClient>
       </body>
     </html>
