@@ -3,7 +3,16 @@ import Button from "./Button";
 import useReveal from "../hooks/useReveal";
 import { useRef } from "react";
 
-export default function Hero() {
+interface HeroProps {
+  title?: string;
+  lead?: string;
+  sub?: string;
+  buttonText?: string | null;
+  showButton?: boolean;
+  onButtonClick?: () => void;
+}
+
+export default function Hero({ title = "Welcome to PIER", lead = "PELINDO Integrated Electronic Repository. A digital solution for your company", sub = "", buttonText = "Start Exploring", showButton = true, onButtonClick }: HeroProps) {
   const containerRef = useReveal<HTMLDivElement>();
   const parallaxRef = useRef<HTMLDivElement | null>(null);
 
@@ -41,14 +50,17 @@ export default function Hero() {
 
         <div ref={containerRef} onPointerMove={handlePointerMove} onPointerLeave={handlePointerLeave} className="absolute inset-0 flex items-center justify-center">
           <div className="text-center px-6 max-w-3xl reveal-from-bottom reveal stagger">
-            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-extrabold drop-shadow-lg reveal-from-left">Welcome to PIER</h1>
-            <p className="mt-4 text-white/90 text-base sm:text-lg md:text-xl font-medium drop-shadow-lg reveal-from-bottom">PELINDO Integrated Electronic Repository. A digital solution for your company</p>
+            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-extrabold drop-shadow-lg reveal-from-left">{title}</h1>
+            {lead ? <p className="mt-4 text-white/90 text-base sm:text-lg md:text-xl font-medium drop-shadow-lg reveal-from-bottom">{lead}</p> : null}
+            {sub ? <p className="mt-3 text-white/80 text-sm sm:text-base drop-shadow-lg reveal-from-bottom">{sub}</p> : null}
 
-            <div className="mt-8 flex items-center justify-center reveal-from-bottom">
-              <Button variant="primary" size="md">
-                Start Exploring
-              </Button>
-            </div>
+            {showButton && buttonText ? (
+              <div className="mt-8 flex items-center justify-center reveal-from-bottom">
+                <Button variant="primary" size="md" onClick={onButtonClick}>
+                  {buttonText}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

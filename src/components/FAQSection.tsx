@@ -13,7 +13,7 @@ const faqs = [
   {
     id: "faq-2",
     title: "How do I register and use the service?",
-    content: "You can register through the registration page. After registering, our team will verify your account and grant access to the management dashboard.",
+    content: "Register by submitting a vendor registration. Our team will review and approve your submission; an account will be created for you after approval and you'll receive access to the management dashboard.",
   },
   {
     id: "faq-3",

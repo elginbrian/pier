@@ -11,12 +11,18 @@ import FAQSection from "../components/FAQSection";
 import Footer from "../components/Footer";
 
 export default function Home() {
+  const scrollToAbout = () => {
+    if (typeof document === "undefined") return;
+    const el = document.getElementById("about");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <Navigation />
 
       <main className="w-full m-0 p-0">
-        <Hero />
+        <Hero onButtonClick={scrollToAbout} buttonText="Start exploring" />
         <AboutSection />
         <WhyChooseUs />
         <StepsSection />

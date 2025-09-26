@@ -28,6 +28,16 @@ let auth: any = null;
 if (typeof window !== "undefined") {
   assertFirebaseConfig(firebaseConfig);
 
+  try {
+    if (process.env.NODE_ENV !== "production") {
+      const pid = firebaseConfig.projectId ?? "<missing>";
+      const api = typeof firebaseConfig.apiKey === "string" ? firebaseConfig.apiKey.slice(0, 8) + "..." : "<missing>";
+      console.debug(`[firebase][dev] projectId=${pid} apiKeyPrefix=${api}`);
+    }
+  } catch (e) {
+    // silent
+  }
+
   if (!getApps().length) {
     initializeApp(firebaseConfig as any);
   }

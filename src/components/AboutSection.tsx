@@ -1,11 +1,12 @@
 import Image from "next/image";
 import React from "react";
 import Button from "./Button";
+import Link from "next/link";
 import { colors } from "../design-system";
 
 export default function AboutSection() {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-20">
+    <section id="about" className="max-w-7xl mx-auto px-6 py-20">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div>
           <h2 className="text-4xl font-extrabold mb-6 reveal-from-left">
@@ -16,9 +17,11 @@ export default function AboutSection() {
           </p>
 
           <div className="w-48">
-            <Button variant="primary" size="md" className="w-full">
-              Get Started
-            </Button>
+            <Link href="/vendor-registration" className="w-full block">
+              <Button variant="primary" size="md" className="w-full">
+                Get Started
+              </Button>
+            </Link>
           </div>
         </div>
 

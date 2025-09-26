@@ -1,50 +1,91 @@
-import React from 'react';
-import { colors } from '../design-system';
+import React from "react";
+import { colors } from "../design-system";
 
 interface FileUploadFieldProps {
   label: string;
   fieldName: string;
+  fieldKey: string;
   file: File | null;
   onFileChange: (field: string, file: File | null) => void;
+  error?: string | null;
+  disabled?: boolean;
 }
 
-const FileUploadField: React.FC<FileUploadFieldProps> = ({
-  label,
-  fieldName,
-  file,
-  onFileChange
-}) => (
-  <div>
-    <label className="block text-sm font-medium mb-2" style={{ color: colors.base[700] }}>
-      {label} <span style={{ color: colors.error[400] }}>*</span>
-    </label>
-    <div className="relative">
-      <input
-        type="text"
-        placeholder="No file chosen"
-        readOnly
-        value={file?.name || ""}
-        className="w-full h-14 px-5 pr-24 border rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <button
-        type="button"
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 text-sm font-medium text-white rounded-lg border"
-        style={{
-          backgroundColor: colors.primary[300],
-          borderColor: colors.primary[300],
+const FileUploadField: React.FC<FileUploadFieldProps> = ({ label, fieldName, fieldKey, file, onFileChange, error }) => {
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [isDragOver, setIsDragOver] = React.useState(false);
+
+  const handleFiles = (f: File | null) => {
+    if (!f) {
+      onFileChange(fieldKey, null);
+      return;
+    }
+
+    setIsUploading(true);
+    onFileChange(fieldKey, f);
+    setTimeout(() => setIsUploading(false), 200);
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-2" style={{ color: colors.base[700] }}>
+        {label} <span style={{ color: colors.error[400] }}>*</span>
+      </label>
+
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragOver(true);
         }}
-        onClick={() => document.getElementById(fieldName)?.click()}
+        onDragLeave={() => setIsDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragOver(false);
+          const dropped = e.dataTransfer.files?.[0] || null;
+          handleFiles(dropped);
+        }}
+        className={`w-full p-4 border rounded-xl bg-gray-50 ${isDragOver ? "border-dashed border-2" : ""} ${error ? "border-red-400" : ""}`}
       >
-        Browse
-      </button>
-      <input
-        id={fieldName}
-        type="file"
-        className="hidden"
-        onChange={(e) => onFileChange(fieldName.replace('dokumen-', 'dokumen'), e.target.files?.[0] || null)}
-      />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-600">
+              {file ? (
+                <div>
+                  <div className="font-medium">{file.name}</div>
+                  <div className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">Drag & drop a PDF here, or</div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {file && (
+              <button type="button" className="text-sm text-red-600 hover:underline" onClick={() => handleFiles(null)}>
+                Remove
+              </button>
+            )}
+
+            <button
+              type="button"
+              className={`px-3 py-1 text-sm font-medium text-white rounded-lg ${isUploading ? "opacity-60 cursor-wait" : ""}`}
+              style={{ backgroundColor: colors.primary[300] }}
+              onClick={() => document.getElementById(fieldName)?.click()}
+              aria-disabled={isUploading}
+            >
+              {isUploading ? "Processing..." : "Browse"}
+            </button>
+            <input id={fieldName} aria-hidden style={{ display: "none" }} type="file" accept="application/pdf" className="hidden" onChange={(e) => handleFiles(e.target.files?.[0] || null)} />
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center justify-between mt-2">
+        <p className="text-xs text-gray-500">Only PDF files accepted. Max 5MB.</p>
+        {error ? <div className="text-xs text-red-600">{error}</div> : null}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default FileUploadField;
