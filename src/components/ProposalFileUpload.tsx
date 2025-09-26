@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Button from './Button';
 
@@ -8,7 +8,9 @@ interface ProposalFileUploadProps {
   required?: boolean;
   acceptedTypes?: string;
   maxSize?: string;
-  onFileSelect?: (file: File) => void;
+  onFileSelect?: (file: File | null) => void;
+  file?: File | null;
+  error?: string;
 }
 
 const ProposalFileUpload: React.FC<ProposalFileUploadProps> = ({
@@ -17,13 +19,28 @@ const ProposalFileUpload: React.FC<ProposalFileUploadProps> = ({
   required = false,
   acceptedTypes = "PDF, DOC, DOCX",
   maxSize = "10MB",
-  onFileSelect
+  onFileSelect,
+  file,
+  error
 }) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(file || null);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && onFileSelect) {
-      onFileSelect(file);
+    const newFile = e.target.files?.[0] || null;
+    setSelectedFile(newFile);
+    if (onFileSelect) {
+      onFileSelect(newFile);
     }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (onFileSelect) {
+      onFileSelect(null);
+    }
+    // Clear the input
+    const input = document.getElementById(`file-${label.replace(/\s+/g, '-').toLowerCase()}`) as HTMLInputElement;
+    if (input) input.value = '';
   };
 
   return (
@@ -38,29 +55,59 @@ const ProposalFileUpload: React.FC<ProposalFileUploadProps> = ({
           </span>
         )}
       </label>
-      <div className="border border-gray-200 rounded-lg p-6 text-center bg-gray-50">
-        <div className="mb-4">
-          <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center">
-            <img src="/upload-pdf-file.svg" alt="Upload PDF" className="inline w-6 h-6" />
+      
+      {selectedFile ? (
+        <div className="border border-gray-200 rounded-lg p-4 bg-green-50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                <img src="/file.svg" alt="File" className="inline w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
+                <p className="text-xs text-gray-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+              </div>
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleRemoveFile}
+            >
+              Remove
+            </Button>
           </div>
         </div>
-        <p className="text-sm text-gray-600 mb-2">{description}</p>
-        <input
-          type="file"
-          className="hidden"
-          id={`file-${label.replace(/\s+/g, '-').toLowerCase()}`}
-          onChange={handleFileChange}
-          accept='.pdf'
-        />
-        <Button 
-          variant="primary" 
-          size="sm"
-          className="bg-base-400"
-          onClick={() => document.getElementById(`file-${label.replace(/\s+/g, '-').toLowerCase()}`)?.click()}
-        >
-          Upload
-        </Button>
-      </div>
+      ) : (
+        <div className={`border rounded-lg p-6 text-center ${
+          error ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'
+        }`}>
+          <div className="mb-4">
+            <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center">
+              <img src="/upload-pdf-file.svg" alt="Upload PDF" className="inline w-6 h-6" />
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-2">{description}</p>
+          <input
+            type="file"
+            className="hidden"
+            id={`file-${label.replace(/\s+/g, '-').toLowerCase()}`}
+            onChange={handleFileChange}
+            accept='.pdf,.doc,.docx'
+          />
+          <Button 
+            variant="primary" 
+            size="sm"
+            className="bg-base-400"
+            onClick={() => document.getElementById(`file-${label.replace(/\s+/g, '-').toLowerCase()}`)?.click()}
+          >
+            Upload
+          </Button>
+        </div>
+      )}
+      
+      {error && (
+        <p className="text-sm text-red-600 mt-1">{error}</p>
+      )}
     </div>
   );
 };
