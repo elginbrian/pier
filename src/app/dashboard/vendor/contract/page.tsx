@@ -9,6 +9,7 @@ import ContractStepper from "@/components/ContractStepper";
 import ContractAlert from "@/components/ContractAlert";
 import DeclinedContractUI from "@/components/DeclinedContractUI";
 import NormalContractForm from "@/components/NormalContractForm";
+import ContractStartedUI from "@/components/ContractStartedUI";
 import { getContractById, Contract, getVendorContracts } from "@/services/dashboard";
 import { getProposalById } from "@/services/proposals";
 
@@ -321,12 +322,22 @@ export default function ContractReviewPage() {
           <ContractAlert isDeclined={isDeclined} />
 
           {/* Main Content */}
-          {isDeclined ? <DeclinedContractUI /> : <NormalContractForm formData={formData} onInputChange={handleInputChange} documentUrls={{
-            proposalHargaUrl: (contract as any).proposalHargaUrl,
-            companyDeedUrl: (contract as any).companyDeedUrl,
-            businessLicenseUrl: (contract as any).businessLicenseUrl,
-            portfolioUrl: (contract as any).portfolioUrl
-          }} />}
+          {isDeclined ? (
+            <DeclinedContractUI />
+          ) : contract.status === 'active' ? (
+            <ContractStartedUI />
+          ) : (
+            <NormalContractForm 
+              formData={formData} 
+              onInputChange={handleInputChange} 
+              documentUrls={{
+                proposalHargaUrl: (contract as any).proposalHargaUrl,
+                companyDeedUrl: (contract as any).companyDeedUrl,
+                businessLicenseUrl: (contract as any).businessLicenseUrl,
+                portfolioUrl: (contract as any).portfolioUrl
+              }} 
+            />
+          )}
         </>
       )}
     </main>
