@@ -58,38 +58,54 @@ export default function NormalContractForm({ formData, onInputChange, documentUr
           <FormSection title="Informasi Umum" icon="/info.svg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField label="Nama Perusahaan" required>
-                <Input
+                <input
                   type="text"
+                  className="w-full px-3 py-2 rounded-md"
+                  style={{
+                    border: `1px solid ${colors.base[300]}`,
+                    color: colors.base[700]
+                  }}
                   value={formData.companyName}
-                  onChange={onInputChange('companyName')}
-                  disabled
+                  readOnly
                 />
               </FormField>
 
               <FormField label="Kontak PIC" required>
-                <Input
+                <input
                   type="text"
+                  className="w-full px-3 py-2 rounded-md"
+                  style={{
+                    border: `1px solid ${colors.base[300]}`,
+                    color: colors.base[700]
+                  }}
                   value={formData.contactPerson}
-                  onChange={onInputChange('contactPerson')}
-                  disabled
+                  readOnly
                 />
               </FormField>
 
               <FormField label="Judul Proposal" required>
-                <Input
+                <input
                   type="text"
+                  className="w-full px-3 py-2 rounded-md"
+                  style={{
+                    border: `1px solid ${colors.base[300]}`,
+                    color: colors.base[700]
+                  }}
                   value={formData.proposalTitle}
-                  onChange={onInputChange('proposalTitle')}
-                  disabled
+                  readOnly
                 />
               </FormField>
 
               <FormField label="Jenis Layanan" required>
-                <Input
+                <input
                   type="text"
+                  className="w-full px-3 py-2 rounded-md"
+                  style={{
+                    border: `1px solid ${colors.base[300]}`,
+                    color: colors.base[700]
+                  }}
                   value={formData.serviceType}
-                  onChange={onInputChange('serviceType')}
-                  disabled
+                  readOnly
                 />
               </FormField>
             </div>
@@ -105,13 +121,11 @@ export default function NormalContractForm({ formData, onInputChange, documentUr
                   className="w-full px-3 py-2 rounded-md"
                   style={{
                     border: `1px solid ${colors.base[300]}`,
-                    backgroundColor: colors.base[100],
                     color: colors.base[700]
                   }}
                   value={formData.technicalSpec}
                   rows={6}
                   readOnly
-                  disabled
                 />
               </FormField>
 
@@ -122,12 +136,10 @@ export default function NormalContractForm({ formData, onInputChange, documentUr
                     className="w-full px-3 py-2 rounded-md"
                     style={{
                       border: `1px solid ${colors.base[300]}`,
-                      backgroundColor: colors.base[100],
                       color: colors.base[700]
                     }}
                     value={formData.startDate}
                     readOnly
-                    disabled
                   />
                 </FormField>
 
@@ -137,12 +149,10 @@ export default function NormalContractForm({ formData, onInputChange, documentUr
                     className="w-full px-3 py-2 rounded-md"
                     style={{
                       border: `1px solid ${colors.base[300]}`,
-                      backgroundColor: colors.base[100],
                       color: colors.base[700]
                     }}
                     value={formData.endDate}
                     readOnly
-                    disabled
                   />
                 </FormField>
               </div>
@@ -155,10 +165,15 @@ export default function NormalContractForm({ formData, onInputChange, documentUr
           <FormSection title="Anggaran & Biaya" icon="/dollar.svg">
             <div className="space-y-6">
               <FormField label="Nilai Kontrak (Rp)" required>
-                <Input
+                <input
                   type="number"
+                  className="w-full px-3 py-2 rounded-md"
+                  style={{
+                    border: `1px solid ${colors.base[300]}`,
+                    color: colors.base[700]
+                  }}
                   value={formData.contractValue}
-                  disabled
+                  readOnly
                 />
               </FormField>
 
@@ -167,13 +182,11 @@ export default function NormalContractForm({ formData, onInputChange, documentUr
                   className="w-full px-3 py-2 rounded-md"
                   style={{
                     border: `1px solid ${colors.base[300]}`,
-                    backgroundColor: colors.base[100],
                     color: colors.base[700]
                   }}
                   value={formData.paymentTerms}
                   rows={4}
                   readOnly
-                  disabled
                 />
               </FormField>
 
