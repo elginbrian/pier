@@ -11,10 +11,11 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1">
-            <div className="flex items-start">
-              <div className="mr-4">
-                <Image src="/logo-pelindo.png" alt="Pelindo" width={120} height={48} style={{ filter: "brightness(0) invert(1)" }} />
+            <div className="flex items-center">
+              <div className="mr-2 bg-white rounded-lg shadow p-4 flex items-center">
+              <Image src="/logo-pelindo.png" alt="Pelindo" width={120} height={48} />
               </div>
+              <span className="text-lg font-bold">PIER</span>
             </div>
             <p className="mt-4 text-sm text-indigo-100">Digital transformation for more efficient and professional contract management.</p>
           </div>
