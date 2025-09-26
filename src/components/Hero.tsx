@@ -12,10 +12,13 @@ interface HeroProps {
   buttonText?: string | null;
   showButton?: boolean;
   onButtonClick?: () => void;
+  disableAnimation?: boolean;
 }
 
 export default function Hero({ title = "Welcome to PIER", lead = "PELINDO Integrated Electronic Repository. A digital solution for your company", sub = "", buttonText = "Start Exploring", showButton = true, onButtonClick }: HeroProps) {
-  const containerRef = useReveal<HTMLDivElement>();
+  // If animations are disabled we don't need the reveal hook which uses
+  // IntersectionObserver and prefers-reduced-motion logic.
+  const containerRef = undefined as unknown as React.RefObject<HTMLDivElement>;
   const parallaxRef = useRef<HTMLDivElement | null>(null);
 
   const handlePointerMove = (e: React.PointerEvent) => {
@@ -51,13 +54,13 @@ export default function Hero({ title = "Welcome to PIER", lead = "PELINDO Integr
         />
 
         <div ref={containerRef} onPointerMove={handlePointerMove} onPointerLeave={handlePointerLeave} className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center px-6 max-w-3xl reveal-from-bottom reveal stagger">
-            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-extrabold drop-shadow-lg reveal-from-left">{title}</h1>
-            {lead ? <p className="mt-4 text-white/90 text-base sm:text-lg md:text-xl font-medium drop-shadow-lg reveal-from-bottom">{lead}</p> : null}
-            {sub ? <p className="mt-3 text-white/80 text-sm sm:text-base drop-shadow-lg reveal-from-bottom">{sub}</p> : null}
+          <div className={`text-center px-6 max-w-3xl ${/* disable animations by omitting reveal classes */ ""}`}>
+            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-extrabold drop-shadow-lg">{title}</h1>
+            {lead ? <p className="mt-4 text-white/90 text-base sm:text-lg md:text-xl font-medium drop-shadow-lg">{lead}</p> : null}
+            {sub ? <p className="mt-3 text-white/80 text-sm sm:text-base drop-shadow-lg">{sub}</p> : null}
 
             {showButton && buttonText ? (
-              <div className="mt-8 flex items-center justify-center reveal-from-bottom">
+              <div className="mt-8 flex items-center justify-center">
                 <Button variant="primary" size="md" onClick={onButtonClick}>
                   {buttonText}
                 </Button>

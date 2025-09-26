@@ -131,12 +131,12 @@ export default function ClientVendorRegistrationPage() {
     <div className="min-h-screen bg-white text-gray-900">
       <Navigation />
 
-      <Hero title={"Vendor Registration"} showButton={true} buttonText={"Fill the Form"} onButtonClick={handleHeroCTA} />
+      <Hero title={"Vendor Registration"} showButton={true} buttonText={"Fill the Form"} onButtonClick={handleHeroCTA} disableAnimation={true} />
 
       <div className="max-w-7xl mx-auto py-12 mb-4">
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: colors.base[700] }}>
-            Pendaftaran Vendor
+            Vendor Registration
           </h1>
           <div className="text-base text-gray-700">
             <p className="mb-4">
