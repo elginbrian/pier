@@ -105,11 +105,11 @@ export default function ManagementDashboardPage() {
                 <p className="text-sm mb-1" style={{ color: colors.base[500] }}>Total Kontrak</p>
                 <p className="text-3xl font-bold" style={{ color: colors.base[700] }}>24</p>
               </div>
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.primary[100] }}>
-                <svg className="w-6 h-6" style={{ color: colors.primary[500] }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
+              <img
+                src="/management-file.svg"
+                alt="Management File"
+                className="w-8 h-8 rounded-lg object-contain"
+              />
             </div>
           </div>
 
@@ -120,11 +120,11 @@ export default function ManagementDashboardPage() {
                 <p className="text-sm mb-1" style={{ color: colors.base[500] }}>Kontrak Aktif</p>
                 <p className="text-3xl font-bold" style={{ color: colors.base[700] }}>8</p>
               </div>
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.success[100] }}>
-                <svg className="w-6 h-6" style={{ color: colors.success[500] }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+              <img
+                src="/tick-fill.svg"
+                alt="Tick"
+                className="w-8 h-8 rounded-lg object-contain"
+              />
             </div>
           </div>
 
@@ -135,11 +135,11 @@ export default function ManagementDashboardPage() {
                 <p className="text-sm mb-1" style={{ color: colors.base[500] }}>Pending Review</p>
                 <p className="text-3xl font-bold" style={{ color: colors.base[700] }}>5</p>
               </div>
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.warning[100] }}>
-                <svg className="w-6 h-6" style={{ color: colors.warning[500] }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+              <img
+                src="/pending-fill.svg"
+                alt="Pending Fill"
+                className="w-8 h-8 rounded-lg object-contain"
+              />
             </div>
           </div>
 
@@ -150,19 +150,19 @@ export default function ManagementDashboardPage() {
                 <p className="text-sm mb-1" style={{ color: colors.base[500] }}>Akan Berakhir</p>
                 <p className="text-3xl font-bold" style={{ color: colors.base[700] }}>3</p>
               </div>
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.error[100] }}>
-                <svg className="w-6 h-6" style={{ color: colors.error[500] }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
+              <img
+                src="/warning-fill.svg"
+                alt="Warning Fill"
+                className="w-8 h-8 rounded-lg object-contain"
+              />
             </div>
           </div>
         </div>
 
         {/* Linimasa Kontrak Chart */}
+        <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>Linimasa Kontrak</h2>
         <div className="bg-white rounded-lg shadow-sm mb-8 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>Linimasa Kontrak</h2>
             <div className="text-sm font-medium" style={{ color: colors.base[700] }}>Tahun 2025</div>
           </div>
 
@@ -174,11 +174,8 @@ export default function ManagementDashboardPage() {
         <div className="grid grid-cols-2 gap-8">
           {/* Timeline Tenggat Waktu */}
           <div className="bg-white rounded-lg shadow-sm">
-            <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
-              <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>Timeline Tenggat Waktu</h2>
-            </div>
-
             <div className="p-6">
+              <h2 className="text-lg font-semibold pb-2" style={{ color: colors.base[700] }}>Timeline Tenggat Waktu</h2>
               <div className="space-y-4">
                 {timelineContracts.map((contract, index) => (
                   <div
@@ -190,10 +187,10 @@ export default function ManagementDashboardPage() {
                     key={index}
                   >
                     <div className="flex items-center w-full space-x-4">
-                        <div
+                      <div
                         className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: contract.borderColor, minWidth: '1rem', minHeight: '1rem' }}
-                        ></div>
+                      ></div>
                       <div>
                         <h3 className="text-sm font-semibold mb-1" style={{ color: colors.base[700] }}>
                           {contract.company}
@@ -213,30 +210,25 @@ export default function ManagementDashboardPage() {
           </div>
 
           {/* Status Kontrak */}
-          <div className="bg-white rounded-lg shadow-sm">
-            <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
-              <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>Status Kontrak</h2>
-            </div>
-
-            <div className="p-6">
-              <div className="space-y-4">
-                {statusData.map((status, index) => (
-                  <div key={index} className="flex items-center py-3 rounded-lg" style={{ backgroundColor: `${status.color}33` }}>
-                    <div className="flex items-center w-full space-x-2 px-4">
-                        <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: status.color, minWidth: '1rem', minHeight: '1rem' }}
-                        ></div>
-                      <span className="text-sm font-medium w-full" style={{ color: colors.base[700] }}>
-                        {status.label}
-                      </span>
-                      <span className="text-lg font-bold pr-4 text-end" style={{ color: status.textColor }}>
-                        {status.count}
-                      </span>
-                    </div>
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-lg font-semibold pb-2" style={{ color: colors.base[700] }}>Status Kontrak</h2>
+            <div className="space-y-4">
+              {statusData.map((status, index) => (
+                <div key={index} className="flex items-center py-3 rounded-lg" style={{ backgroundColor: `${status.color}33` }}>
+                  <div className="flex items-center w-full space-x-2 px-4">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: status.color, minWidth: '1rem', minHeight: '1rem' }}
+                    ></div>
+                    <span className="text-sm font-bold w-full" style={{ color: colors.base[700] }}>
+                      {status.label}
+                    </span>
+                    <span className="text-lg font-bold pr-4 text-end" style={{ color: status.textColor }}>
+                      {status.count}
+                    </span>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
