@@ -70,3 +70,5 @@ export default function Accordion({ items }: { items: AccordionItem[] }) {
     </div>
   );
 }
+
+// (merged conflict resolved: kept the top implementation)
