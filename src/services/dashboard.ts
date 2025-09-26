@@ -34,7 +34,7 @@ export interface Contract {
   contractValue: string;
   startDate: string;
   endDate: string;
-  status: 'active' | 'pending' | 'expired' | 'terminated';
+  status: 'pending' | 'under_review' | 'approved' | 'active' | 'expired' | 'terminated' | 'rejected';
   daysRemaining?: number;
   createdAt: any;
 }
@@ -139,6 +139,48 @@ export async function getVendorContracts(userId: string): Promise<Contract[]> {
   } catch (error) {
     console.error("Error fetching vendor contracts:", error);
     throw error;
+  }
+}
+
+export async function getContractById(contractId: string): Promise<Contract | null> {
+  try {
+    console.log("[dashboard] Getting contract by ID:", contractId);
+    
+    const contractDoc = doc(db, 'contracts', contractId);
+    const contractSnapshot = await getDoc(contractDoc);
+    
+    if (!contractSnapshot.exists()) {
+      console.log("[dashboard] Contract not found:", contractId);
+      return null;
+    }
+    
+    const data = contractSnapshot.data();
+    const contract: Contract = {
+      id: contractSnapshot.id,
+      title: data.title || data.proposalTitle || "Untitled Contract",
+      vendorName: data.companyName || data.vendorName || "Unknown Vendor",
+      contractValue: data.contractValue || "0",
+      startDate: data.startDate || "",
+      endDate: data.endDate || "",
+      status: data.status || "pending",
+      createdAt: data.createdAt
+    };
+
+    // Calculate days remaining if contract is active and has end date
+    if (contract.status === 'active' && contract.endDate) {
+      const endDate = new Date(contract.endDate);
+      const today = new Date();
+      const diffTime = endDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      contract.daysRemaining = diffDays > 0 ? diffDays : 0;
+    }
+    
+    console.log("[dashboard] Found contract:", contract);
+    return contract;
+    
+  } catch (error) {
+    console.error("[dashboard] Error getting contract by ID:", error);
+    return null;
   }
 }
 

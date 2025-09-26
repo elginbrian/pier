@@ -103,7 +103,7 @@ const ProposalPage = () => {
 
   // Filter active contracts from the contracts data
   const activeContracts = contracts.filter(contract => 
-    contract.status === 'active' || contract.status === 'pending'
+    contract.status === 'active' || contract.status === 'pending' || contract.status === 'under_review' || contract.status === 'approved'
   );
 
   // Use real active contracts data
@@ -118,22 +118,24 @@ const ProposalPage = () => {
   // Contract table data - use real proposals data
   const contractsData = paginatedProposals.map(proposal => ({
     id: proposal.id.substring(0, 6),
+    originalId: proposal.id, // Keep original ID for navigation
     name: proposal.proposalTitle,
     amount: proposal.contractValue || "Rp 0",
     expiry: new Date(proposal.createdAt?.toDate?.() || proposal.createdAt).toLocaleDateString('id-ID'),
     type: proposal.serviceType,
     status: proposal.status === 'pending' ? 'Draft' as const :
            proposal.status === 'under_review' ? 'Diproses' as const :
-           proposal.status === 'approved' ? 'Selesai' as const :
+           proposal.status === 'approved' ? 'Disetujui' as const :
            proposal.status === 'rejected' ? 'Ditolak' as const : 'Draft' as const,
   }));
 
-  const getStatusBadge = (status: "Draft" | "Diproses" | "Ditolak" | "Selesai") => {
+  const getStatusBadge = (status: "Draft" | "Diproses" | "Disetujui" | "Ditolak" | "Selesai") => {
     const statusConfig = {
       Draft: { bg: colors.base[100], text: colors.base[700] },
       Diproses: { bg: colors.warning[100], text: colors.warning[700] },
+      Disetujui: { bg: colors.success[100], text: colors.success[700] },
       Ditolak: { bg: colors.error[100], text: colors.error[700] },
-      Selesai: { bg: colors.success[100], text: colors.success[700] },
+      Selesai: { bg: colors.primary[100], text: colors.primary[700] },
     };
 
     const config = statusConfig[status] || statusConfig["Draft"];
@@ -151,6 +153,15 @@ const ProposalPage = () => {
 
   const handleCreateProposal = () => {
     router.push('/dashboard/vendor/proposal/create');
+  };
+
+  const handleContractClick = (contractId: string) => {
+    router.push(`/dashboard/vendor/contract?id=${contractId}`);
+  };
+
+  const handleProposalClick = (proposalId: string) => {
+    // Navigate to contract page since proposals become contracts when processed
+    router.push(`/dashboard/vendor/contract?id=${proposalId}`);
   };
 
   // Show loading state
@@ -249,7 +260,11 @@ const ProposalPage = () => {
                 <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>
                   Kontrak Aktif
                 </h2>
-                <button className="text-sm font-medium hover:underline" style={{ color: colors.primary[600] }}>
+                <button 
+                  className="text-sm font-medium hover:underline" 
+                  style={{ color: colors.primary[600] }}
+                  onClick={() => router.push('/dashboard/vendor/contract')}
+                >
                   Lihat Semua
                 </button>
               </div>
@@ -258,7 +273,10 @@ const ProposalPage = () => {
             <div>
               {activeContractsData.map((contract, index) => (
                 <div key={contract.id}>
-                  <div className="p-6 flex items-center justify-between">
+                  <div 
+                    className="p-6 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors" 
+                    onClick={() => handleContractClick(contract.id)}
+                  >
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.primary[100] }}>
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke={colors.primary[600]}>
@@ -320,12 +338,13 @@ const ProposalPage = () => {
                     {contractsData.map((contract, index) => (
                       <tr
                         key={contract.id}
-                        className="hover:bg-opacity-50"
+                        className="hover:bg-opacity-50 cursor-pointer"
                         style={{
                           borderBottom: index < contractsData.length - 1 ? `1px solid ${colors.base[200]}` : "none",
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.base[100])}
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                        onClick={() => handleProposalClick(contract.originalId)}
                       >
                         <td className="py-4 px-4 text-sm" style={{ color: colors.base[700] }}>
                           {contract.id}
@@ -388,7 +407,11 @@ const ProposalPage = () => {
             </div>
 
             <div className="p-6 space-y-4">
-              <button className="w-full py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors hover:opacity-90" style={{ backgroundColor: colors.primary[600], color: "#ffffff" }}>
+              <button 
+                className="w-full py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors hover:opacity-90" 
+                style={{ backgroundColor: colors.primary[600], color: "#ffffff" }}
+                onClick={handleCreateProposal}
+              >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <line x1="12" y1="5" x2="12" y2="19" strokeWidth="2" />
                   <line x1="5" y1="12" x2="19" y2="12" strokeWidth="2" />

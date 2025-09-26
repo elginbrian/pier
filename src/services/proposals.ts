@@ -1,7 +1,7 @@
 "use client";
 
 import { app } from "../firebase/init";
-import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export type ProposalPayload = {
@@ -79,6 +79,34 @@ export async function submitProposal(payload: ProposalPayload, files?: Record<st
   return { id: ref.id, ...doc };
 }
 
+export async function getProposalById(proposalId: string): Promise<any | null> {
+  try {
+    console.log("[proposals] Getting proposal by ID:", proposalId);
+    
+    const proposalDoc = doc(db, 'proposals', proposalId);
+    const proposalSnapshot = await getDoc(proposalDoc);
+    
+    if (!proposalSnapshot.exists()) {
+      console.log("[proposals] Proposal not found:", proposalId);
+      return null;
+    }
+    
+    const data = proposalSnapshot.data();
+    const proposal = {
+      id: proposalSnapshot.id,
+      ...data
+    };
+    
+    console.log("[proposals] Found proposal:", proposal);
+    return proposal;
+    
+  } catch (error) {
+    console.error("[proposals] Error getting proposal by ID:", error);
+    return null;
+  }
+}
+
 export default {
   submitProposal,
+  getProposalById,
 };
