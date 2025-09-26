@@ -41,12 +41,12 @@ export default function Hero() {
 
         <div ref={containerRef} onPointerMove={handlePointerMove} onPointerLeave={handlePointerLeave} className="absolute inset-0 flex items-center justify-center">
           <div className="text-center px-6 max-w-3xl reveal-from-bottom reveal stagger">
-            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-extrabold drop-shadow-lg reveal-from-left">Selamat Datang di PIER</h1>
-            <p className="mt-4 text-white/90 text-base sm:text-lg md:text-xl font-medium drop-shadow-lg reveal-from-bottom">PELINDO Integrated Electronic Repository. Solusi Digital Untuk Perusahaanmu</p>
+            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-extrabold drop-shadow-lg reveal-from-left">Welcome to PIER</h1>
+            <p className="mt-4 text-white/90 text-base sm:text-lg md:text-xl font-medium drop-shadow-lg reveal-from-bottom">PELINDO Integrated Electronic Repository. A digital solution for your company</p>
 
             <div className="mt-8 flex items-center justify-center reveal-from-bottom">
               <Button variant="primary" size="md">
-                Mulai Jelajahi
+                Start Exploring
               </Button>
             </div>
           </div>

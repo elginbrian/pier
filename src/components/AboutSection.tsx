@@ -9,16 +9,15 @@ export default function AboutSection() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div>
           <h2 className="text-4xl font-extrabold mb-6 reveal-from-left">
-            Tentang <span style={{ color: colors.primary[300] }}>PT. ILCS</span>
+            About <span style={{ color: colors.primary[300] }}>PT. ILCS</span>
           </h2>
           <p className="text-gray-600 mb-8 reveal-from-bottom">
-            Kami adalah pemimpin di industri teknologi yang menyediakan platform berbasis AI untuk mengoptimalkan operasional logistik dan pelabuhan. Dengan solusi kami, Anda bisa mengelola dokumen dan berkoordinasi dengan pihak lain secara
-            lebih efisien dan produktif.
+            We are a technology leader delivering AI-driven platforms to optimize logistics and port operations. With our solutions you can manage documents and coordinate with partners more efficiently and productively.
           </p>
 
           <div className="w-48">
             <Button variant="primary" size="md" className="w-full">
-              Mulai
+              Get Started
             </Button>
           </div>
         </div>

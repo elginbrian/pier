@@ -15,6 +15,11 @@ const plusJakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "PIER",
   description: "PELINDO Integrated Electronic Repository",
+  icons: {
+    icon: "/pelindo-plain.png",
+    shortcut: "/pelindo-plain.png",
+    apple: "/pelindo-plain.png",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -24,6 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <head>
         <style dangerouslySetInnerHTML={{ __html: `:root{${cssVars}}` }} />
+        <link rel="icon" href="/pelindo-plain.png" />
       </head>
       <body className={`${plusJakarta.variable} antialiased`}>
         <AuthProviderClient>

@@ -5,10 +5,10 @@ import { colors } from "../design-system";
 
 export default function StepsSection() {
   const steps = [
-    { title: "Registrasi", desc: 'Lakukan Registrasi Sebagai Vendor Dengan Menekan Tombol "Mulai" Di Samping', img: "/step-1.png" },
-    { title: "Isi Formulir Online", desc: "Melengkapi Formulir Registrasi Dengan Mengisi Data-Data Yang Diminta", img: "/step-2.png" },
-    { title: "Unggah Dokumen Pendukung", desc: "Unggah Dokumen-Dokumen Pendukung Yang Diminta Pada Form Registrasi", img: "/step-3.png" },
-    { title: "Kirim dan Tunggu Notifikasi", desc: "Submit Formulir Registrasi Dan Harap Menunggu Konfirmasi Pengajuan Melalui Notifikasi", img: "/step-4.png" },
+    { title: "Registration", desc: 'Register as a vendor by clicking the "Get Started" button next to it', img: "/step-1.png" },
+    { title: "Fill Online Form", desc: "Complete the registration form by providing the requested information", img: "/step-2.png" },
+    { title: "Upload Supporting Documents", desc: "Upload the required supporting documents in the registration form", img: "/step-3.png" },
+    { title: "Submit and Wait for Notification", desc: "Submit the registration form and wait for a confirmation notification", img: "/step-4.png" },
   ];
 
   return (
@@ -16,16 +16,15 @@ export default function StepsSection() {
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         <div>
           <h2 className="text-4xl font-extrabold mb-6 reveal-from-left" style={{ color: colors.base[700] }}>
-            Langkah-Langkah Membuat Kontrak Bersama <span style={{ color: colors.primary[300] }}>PIER</span>
+            Steps to Create a Contract with <span style={{ color: colors.primary[300] }}>PIER</span>
           </h2>
           <p className="mb-6 reveal-from-bottom" style={{ color: colors.base[500] }}>
-            PIER adalah platform manajemen kontrak berbasis AI yang digunakan PT ILCS untuk mempermudah pengelolaan seluruh siklus hidup kontrak, mulai dari pendaftaran vendor, pengajuan proposal, drafting kontrak, hingga monitoring kontrak
-            secara real-time.
+            PIER is an AI-powered contract management platform used by PT ILCS to simplify the entire contract lifecycle management, from vendor registration, proposal submission, contract drafting, to real-time contract monitoring.
           </p>
 
           <div className="w-48">
             <Button variant="primary" size="md" className="w-full">
-              Buat Kontrak
+              Create Contract
             </Button>
           </div>
         </div>

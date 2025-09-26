@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
-import { FiUser, FiLock, FiLogIn } from 'react-icons/fi';
+import { FiUser, FiLock, FiLogIn } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
 import { useToasts } from "../../../components/ToastProvider";
@@ -26,16 +26,16 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     if (!identifier || !password) {
-      setError("Email dan password wajib diisi");
+      setError("Email and password are required");
       return;
     }
     setLoading(true);
     try {
       await signIn(identifier, password);
-      showToast("success", "Berhasil masuk");
+      showToast("success", "Successfully signed in");
       router.push("/");
     } catch (err: any) {
-      const msg = err?.message || "Gagal masuk";
+      const msg = err?.message || "Failed to sign in";
       setError(msg);
       showToast("error", msg);
     } finally {
@@ -60,44 +60,31 @@ export default function LoginPage() {
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <Input
-                label="Username / Email"
-                placeholder="Masukkan username atau email"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                leftIcon={<FiUser />}
-              />
+              <Input label="Username / Email" placeholder="Enter username or email" value={identifier} onChange={(e) => setIdentifier(e.target.value)} leftIcon={<FiUser />} />
 
-              <Input
-                label="Password"
-                placeholder="Masukkan password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                leftIcon={<FiLock />}
-              />
+              <Input label="Password" placeholder="Enter password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} leftIcon={<FiLock />} />
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 text-sm text-gray-600">
                   <input type="checkbox" className="w-4 h-4" />
-                  Ingat saya
+                  Remember me
                 </label>
                 <Link href="/auth/forgot" className="text-sm text-[color:var(--pier-primary-700)] hover:underline">
-                  Lupa Password?
+                  Forgot Password?
                 </Link>
               </div>
 
               {error && <div className="text-sm text-red-600">{error}</div>}
 
-              <Button type="submit" disabled={loading} className="w-full py-3 rounded-md font-medium hover:brightness-95" leftIcon={<FiLogIn />}> 
-                {loading ? "Masuk..." : "Masuk"}
+              <Button type="submit" disabled={loading} className="w-full py-3 rounded-md font-medium hover:brightness-95" leftIcon={<FiLogIn />}>
+                {loading ? "Signing in..." : "Sign in"}
               </Button>
             </form>
 
             <p className="text-center text-sm text-gray-600 mt-6">
-              Belum punya akun?{" "}
+              Don't have an account?{" "}
               <Link href="/auth/register" className="text-[color:var(--pier-primary-700)] hover:underline">
-                Daftar
+                Register
               </Link>
             </p>
 
