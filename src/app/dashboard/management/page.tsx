@@ -62,20 +62,20 @@ export default function ManagementDashboardPage() {
     {
       label: 'Aktif',
       count: 247,
-      color: colors.success[500],
-      textColor: colors.success[600]
+      color: colors.success[300],
+      textColor: colors.success[500]
     },
     {
       label: 'Pending Renewal',
       count: 18,
-      color: colors.warning[500],
-      textColor: colors.warning[600]
+      color: colors.secondary[200],
+      textColor: colors.secondary[400]
     },
     {
       label: 'Expired',
       count: 12,
-      color: colors.error[500],
-      textColor: colors.error[600]
+      color: colors.error[300],
+      textColor: colors.error[500]
     },
     {
       label: 'Draft',
@@ -94,7 +94,7 @@ export default function ManagementDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: colors.base[100] }}>
+    <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto">
         {/* Stats Cards */}
         <div className="grid grid-cols-4 gap-6 mb-8">
@@ -172,34 +172,39 @@ export default function ManagementDashboardPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-8">
-          {/* Timeline Tengat Waktu */}
+          {/* Timeline Tenggat Waktu */}
           <div className="bg-white rounded-lg shadow-sm">
             <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
-              <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>Timeline Tengat Waktu</h2>
+              <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>Timeline Tenggat Waktu</h2>
             </div>
 
             <div className="p-6">
               <div className="space-y-4">
                 {timelineContracts.map((contract, index) => (
-                  <div key={contract.id} className="flex items-start space-x-4">
-                    <div
-                      className="w-1 h-16 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: contract.borderColor }}
-                    ></div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-sm font-medium mb-1" style={{ color: colors.base[700] }}>
-                            {contract.company}
-                          </h3>
-                          <p className="text-sm" style={{ color: colors.base[500] }}>
-                            {contract.expiry}
-                          </p>
-                        </div>
-                        <span className="text-sm font-semibold" style={{ color: getDaysColor(contract.daysLeft) }}>
-                          {contract.daysLeft}
-                        </span>
+                  <div
+                    className={`flex items-start gap-4 p-2 rounded-lg border-l-4`}
+                    style={{
+                      borderColor: contract.borderColor,
+                      backgroundColor: `${contract.borderColor}1a`
+                    }}
+                    key={index}
+                  >
+                    <div className="flex items-center w-full space-x-4">
+                        <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: contract.borderColor, minWidth: '1rem', minHeight: '1rem' }}
+                        ></div>
+                      <div>
+                        <h3 className="text-sm font-semibold mb-1" style={{ color: colors.base[700] }}>
+                          {contract.company}
+                        </h3>
+                        <p className="text-sm font-medium" style={{ color: colors.base[500] }}>
+                          {contract.expiry}
+                        </p>
                       </div>
+                      <span className="text-sm font-semibold ml-auto" style={{ color: getDaysColor(contract.daysLeft) }}>
+                        {contract.daysLeft}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -216,19 +221,19 @@ export default function ManagementDashboardPage() {
             <div className="p-6">
               <div className="space-y-4">
                 {statusData.map((status, index) => (
-                  <div key={index} className="flex items-center justify-between py-3">
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: status.color }}
-                      ></div>
-                      <span className="text-sm font-medium" style={{ color: colors.base[700] }}>
+                  <div key={index} className="flex items-center py-3 rounded-lg" style={{ backgroundColor: `${status.color}33` }}>
+                    <div className="flex items-center w-full space-x-2 px-4">
+                        <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: status.color, minWidth: '1rem', minHeight: '1rem' }}
+                        ></div>
+                      <span className="text-sm font-medium w-full" style={{ color: colors.base[700] }}>
                         {status.label}
                       </span>
+                      <span className="text-lg font-bold pr-4 text-end" style={{ color: status.textColor }}>
+                        {status.count}
+                      </span>
                     </div>
-                    <span className="text-lg font-bold" style={{ color: status.textColor }}>
-                      {status.count}
-                    </span>
                   </div>
                 ))}
               </div>
@@ -236,6 +241,6 @@ export default function ManagementDashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
