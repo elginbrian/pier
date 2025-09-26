@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { colors } from "@/design-system";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/Spinner";
+import LineChart from "@/components/LineChart";
 import { ExclamationTriangleIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 import {
   subscribeToVendorData,
@@ -17,10 +18,10 @@ import {
 const ProposalPage = () => {
   const router = useRouter();
   const { user } = useAuth();
-  
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  
+
   // Firebase data states
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -52,8 +53,6 @@ const ProposalPage = () => {
       return;
     }
 
-    console.log("[proposals] Setting up real-time data subscription for user:", user.uid);
-
     try {
       // Set up real-time data subscription
       const unsubscribe = subscribeToVendorData(user.uid, (data) => {
@@ -84,13 +83,13 @@ const ProposalPage = () => {
   const generateChartData = () => {
     const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
     const currentYear = new Date().getFullYear();
-    
+
     return months.map(month => {
       // For demo purposes, we'll use some calculated data based on real stats
       // In a real app, you'd track historical data
       const activeCount = Math.floor(Math.random() * 50) + stats.activeContracts;
       const completedCount = Math.floor(Math.random() * 30) + 20;
-      
+
       return {
         month,
         aktif: activeCount,
@@ -102,7 +101,7 @@ const ProposalPage = () => {
   const chartData = generateChartData();
 
   // Filter active contracts from the contracts data
-  const activeContracts = contracts.filter(contract => 
+  const activeContracts = contracts.filter(contract =>
     contract.status === 'active' || contract.status === 'pending' || contract.status === 'under_review' || contract.status === 'approved'
   );
 
@@ -124,9 +123,9 @@ const ProposalPage = () => {
     expiry: new Date(proposal.createdAt?.toDate?.() || proposal.createdAt).toLocaleDateString('id-ID'),
     type: proposal.serviceType,
     status: proposal.status === 'pending' ? 'Draft' as const :
-           proposal.status === 'under_review' ? 'Diproses' as const :
-           proposal.status === 'approved' ? 'Disetujui' as const :
-           proposal.status === 'rejected' ? 'Ditolak' as const : 'Draft' as const,
+      proposal.status === 'under_review' ? 'Diproses' as const :
+        proposal.status === 'approved' ? 'Disetujui' as const :
+          proposal.status === 'rejected' ? 'Ditolak' as const : 'Draft' as const,
   }));
 
   const getStatusBadge = (status: "Draft" | "Diproses" | "Disetujui" | "Ditolak" | "Selesai") => {
@@ -196,60 +195,20 @@ const ProposalPage = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.base[100] }}>
+    <div className="min-h-screen">
       <div className="p-6">
         {/* Linimasa Kontrak Chart */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>
+            Linimasa Kontrak
+          </h2>
+        </div>
         <div className="rounded-lg shadow-sm mb-8 p-6" style={{ backgroundColor: "#ffffff" }}>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>
-              Linimasa Kontrak
-            </h2>
-            <div className="text-sm" style={{ color: colors.base[600] }}>
-              Tahun 2025
-            </div>
+          <div className="text-sm" style={{ color: colors.base[600] }}>
+            Tahun 2025
           </div>
 
-          <div className="flex items-center mb-4 space-x-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-0.5" style={{ backgroundColor: colors.primary[500] }}></div>
-              <span className="text-sm" style={{ color: colors.base[600] }}>
-                Kontrak Aktif
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-0.5" style={{ backgroundColor: colors.base[700] }}></div>
-              <span className="text-sm" style={{ color: colors.base[600] }}>
-                Kontrak Selesai
-              </span>
-            </div>
-          </div>
-
-          {/* Simple Chart Placeholder */}
-          <div className="h-80 flex items-end justify-between px-4" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
-            {chartData.map((data, index) => (
-              <div key={index} className="flex flex-col items-center space-y-2">
-                <div className="flex flex-col items-center space-y-1">
-                  <div
-                    className="w-4 rounded-t"
-                    style={{
-                      height: `${(data.aktif / 120) * 200}px`,
-                      backgroundColor: colors.primary[500],
-                    }}
-                  ></div>
-                  <div
-                    className="w-4 rounded-t"
-                    style={{
-                      height: `${(data.selesai / 120) * 200}px`,
-                      backgroundColor: colors.base[700],
-                    }}
-                  ></div>
-                </div>
-                <span className="text-xs" style={{ color: colors.base[600] }}>
-                  {data.month}
-                </span>
-              </div>
-            ))}
-          </div>
+          <LineChart data={chartData} height={320} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -260,8 +219,8 @@ const ProposalPage = () => {
                 <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>
                   Kontrak Aktif
                 </h2>
-                <button 
-                  className="text-sm font-medium hover:underline" 
+                <button
+                  className="text-sm font-medium hover:underline"
                   style={{ color: colors.primary[600] }}
                   onClick={() => router.push('/dashboard/vendor/contract')}
                 >
@@ -273,8 +232,8 @@ const ProposalPage = () => {
             <div>
               {activeContractsData.map((contract, index) => (
                 <div key={contract.id}>
-                  <div 
-                    className="p-6 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors" 
+                  <div
+                    className="p-6 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
                     onClick={() => handleContractClick(contract.id)}
                   >
                     <div className="flex items-center space-x-4">
@@ -407,8 +366,8 @@ const ProposalPage = () => {
             </div>
 
             <div className="p-6 space-y-4">
-              <button 
-                className="w-full py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors hover:opacity-90" 
+              <button
+                className="w-full py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors hover:opacity-90"
                 style={{ backgroundColor: colors.primary[600], color: "#ffffff" }}
                 onClick={handleCreateProposal}
               >
