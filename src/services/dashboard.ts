@@ -9,6 +9,9 @@ import {
   getDocs, 
   doc, 
   getDoc,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
   orderBy,
   limit,
   onSnapshot,
@@ -389,11 +392,201 @@ export function subscribeToVendorData(
   };
 }
 
+// Extended contract management functions
+
+export interface ContractDetails extends Contract {
+  deliverables: string[];
+  milestones: Milestone[];
+  progress: number;
+  slaRequirements: string[];
+  technicalSpec: string;
+  paymentTerms: string;
+  notifications: ContractNotification[];
+}
+
+export interface Milestone {
+  id: string;
+  title: string;
+  description: string;
+  targetDate: string;
+  actualDate?: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'overdue';
+  progress: number;
+}
+
+export interface ContractNotification {
+  id: string;
+  type: 'milestone' | 'deadline' | 'payment' | 'sla' | 'general';
+  title: string;
+  message: string;
+  dueDate?: string;
+  isRead: boolean;
+  createdAt: any;
+}
+
+// Get detailed contract information with milestones and progress
+export async function getContractDetails(contractId: string): Promise<ContractDetails | null> {
+  try {
+    console.log("[dashboard] Getting detailed contract:", contractId);
+    
+    const contractDoc = doc(db, 'contracts', contractId);
+    const contractSnapshot = await getDoc(contractDoc);
+    
+    if (!contractSnapshot.exists()) {
+      console.log("[dashboard] Contract not found:", contractId);
+      return null;
+    }
+    
+    const data = contractSnapshot.data();
+    
+    // Get milestones for this contract
+    const milestonesQuery = query(
+      collection(db, "contract_milestones"),
+      where("contractId", "==", contractId)
+    );
+    
+    const milestonesSnapshot = await getDocs(milestonesQuery);
+    const milestones: Milestone[] = [];
+    
+    milestonesSnapshot.forEach((doc) => {
+      milestones.push({
+        id: doc.id,
+        ...doc.data()
+      } as Milestone);
+    });
+
+    // Get contract notifications
+    const notificationsQuery = query(
+      collection(db, "contract_notifications"),
+      where("contractId", "==", contractId),
+      orderBy("createdAt", "desc"),
+      limit(10)
+    );
+    
+    const notificationsSnapshot = await getDocs(notificationsQuery);
+    const notifications: ContractNotification[] = [];
+    
+    notificationsSnapshot.forEach((doc) => {
+      notifications.push({
+        id: doc.id,
+        ...doc.data()
+      } as ContractNotification);
+    });
+
+    // Calculate overall progress
+    const completedMilestones = milestones.filter(m => m.status === 'completed').length;
+    const totalMilestones = milestones.length;
+    const progress = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
+
+    const contractDetails: ContractDetails = {
+      id: contractSnapshot.id,
+      title: data.title || data.proposalTitle || "Untitled Contract",
+      vendorName: data.companyName || data.vendorName || "Unknown Vendor",
+      contractValue: data.contractValue || "0",
+      startDate: data.startDate || "",
+      endDate: data.endDate || "",
+      status: data.status || "pending",
+      createdAt: data.createdAt,
+      deliverables: data.deliverables || [
+        "Implementation of integrated logistics management system",
+        "Operational team training and maintenance", 
+        "Technical documentation and user manual",
+        "Support and maintenance for 12 months"
+      ],
+      milestones,
+      progress: Math.round(progress),
+      slaRequirements: data.slaRequirements || [
+        "System uptime minimum 99.5%",
+        "Response time maximum 24 hours",
+        "Monthly performance reports"
+      ],
+      technicalSpec: data.technicalSpec || "",
+      paymentTerms: data.paymentTerms || "",
+      notifications
+    };
+
+    // Calculate days remaining if contract is active
+    if (contractDetails.status === 'active' && contractDetails.endDate) {
+      const endDate = new Date(contractDetails.endDate);
+      const today = new Date();
+      const diffTime = endDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      contractDetails.daysRemaining = diffDays > 0 ? diffDays : 0;
+    }
+    
+    console.log("[dashboard] Contract details loaded:", contractDetails);
+    return contractDetails;
+    
+  } catch (error) {
+    console.error("[dashboard] Error getting contract details:", error);
+    return null;
+  }
+}
+
+// Update contract progress
+export async function updateContractProgress(contractId: string, progress: number): Promise<boolean> {
+  try {
+    const contractDoc = doc(db, 'contracts', contractId);
+    await updateDoc(contractDoc, { progress });
+    return true;
+  } catch (error) {
+    console.error("[dashboard] Error updating contract progress:", error);
+    return false;
+  }
+}
+
+// Add milestone to contract
+export async function addContractMilestone(contractId: string, milestone: Omit<Milestone, 'id'>): Promise<string | null> {
+  try {
+    const milestonesCollection = collection(db, 'contract_milestones');
+    const docRef = await addDoc(milestonesCollection, {
+      ...milestone,
+      contractId,
+      createdAt: serverTimestamp()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error("[dashboard] Error adding milestone:", error);
+    return null;
+  }
+}
+
+// Get contract milestones
+export async function getContractMilestones(contractId: string): Promise<Milestone[]> {
+  try {
+    const milestonesQuery = query(
+      collection(db, "contract_milestones"),
+      where("contractId", "==", contractId)
+    );
+    
+    const querySnapshot = await getDocs(milestonesQuery);
+    const milestones: Milestone[] = [];
+    
+    querySnapshot.forEach((doc) => {
+      milestones.push({
+        id: doc.id,
+        ...doc.data()
+      } as Milestone);
+    });
+    
+    return milestones;
+  } catch (error) {
+    console.error("[dashboard] Error fetching milestones:", error);
+    return [];
+  }
+}
+
 export default {
   getVendorProfile,
   getVendorContracts,
+  getContractById,
   getVendorProposals,
   calculateDashboardStats,
   generateNotifications,
-  subscribeToVendorData
+  subscribeToVendorData,
+  // New contract management functions
+  getContractDetails,
+  updateContractProgress,
+  addContractMilestone,
+  getContractMilestones
 };

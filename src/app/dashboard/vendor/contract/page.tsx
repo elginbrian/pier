@@ -332,7 +332,7 @@ export default function ContractReviewPage() {
           ) : isDeclined ? (
             <DeclinedContractUI />
           ) : contract.status === 'active' ? (
-            <ContractStartedUI />
+            <ContractStartedUI contractId={contract.id} />
           ) : (
             <NormalContractForm 
               formData={formData} 

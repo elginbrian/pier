@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getContractDetails, ContractDetails } from '@/services/dashboard';
 
 // --- SVG Icon Components ---
 // These are included directly in the file to maintain the single-file structure.
@@ -64,13 +65,84 @@ const SlaIcon = ({ className }: { className?: string }) => (
 
 
 // --- Main Component ---
-export default function Signature() {
-  const deliverables = [
-    "Implementation of an integrated logistics management system",
-    "Operational team training and maintenance",
-    "Technical documentation and user manual",
-    "Support and maintenance for 12 months",
-  ];
+interface ContractStartedUIProps {
+  contractId: string;
+}
+
+export default function ContractStartedUI({ contractId }: ContractStartedUIProps) {
+  const [contractDetails, setContractDetails] = useState<ContractDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchContractDetails = async () => {
+      try {
+        setLoading(true);
+        console.log("[ContractStartedUI] Fetching contract details:", contractId);
+        
+        const details = await getContractDetails(contractId);
+        if (details) {
+          setContractDetails(details);
+          setError(null);
+        } else {
+          setError("Contract not found");
+        }
+      } catch (err: any) {
+        console.error("[ContractStartedUI] Error fetching contract:", err);
+        setError(err?.message || "Failed to load contract details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (contractId) {
+      fetchContractDetails();
+    }
+  }, [contractId]);
+
+  if (loading) {
+    return (
+      <div className="bg-slate-50 font-sans p-4 sm:p-6 lg:p-8 min-h-screen">
+        <div className="max-w-7xl mx-auto flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p className="text-slate-600">Loading contract details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !contractDetails) {
+    return (
+      <div className="bg-slate-50 font-sans p-4 sm:p-6 lg:p-8 min-h-screen">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            Error: {error || "Contract not found"}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "Not specified";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long', 
+      year: 'numeric'
+    });
+  };
+
+  const calculateDuration = (startDate: string, endDate: string) => {
+    if (!startDate || !endDate) return "Not specified";
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30));
+    return `${diffMonths} Months`;
+  };
 
   const quickActions = [
     {
@@ -89,7 +161,6 @@ export default function Signature() {
       subtitle: "Monitor performance"
     }
   ];
-
   return (
     <div className="bg-slate-50 font-sans p-4 sm:p-6 lg:p-8 min-h-screen">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -97,7 +168,7 @@ export default function Signature() {
         {/* Main Content */}
         <div className="lg:col-span-2 bg-white p-6 sm:p-8 rounded-2xl shadow-sm">
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6">
-            Contract Details
+            {contractDetails.title}
           </h1>
 
           {/* Date & Duration Cards */}
@@ -108,7 +179,7 @@ export default function Signature() {
               </div>
               <div>
                 <p className="text-sm text-blue-700 font-medium">Contract Start Date</p>
-                <p className="text-lg font-bold text-slate-800">1 January 2025</p>
+                <p className="text-lg font-bold text-slate-800">{formatDate(contractDetails.startDate)}</p>
               </div>
             </div>
             <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 flex items-center">
@@ -117,9 +188,23 @@ export default function Signature() {
               </div>
               <div>
                 <p className="text-sm text-orange-700 font-medium">Contract Duration</p>
-                <p className="text-lg font-bold text-slate-800">12 Months</p>
+                <p className="text-lg font-bold text-slate-800">{calculateDuration(contractDetails.startDate, contractDetails.endDate)}</p>
               </div>
             </div>
+          </div>
+
+          {/* Contract Value and Days Remaining */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <div className="bg-green-50 border border-green-100 rounded-xl p-4">
+              <p className="text-sm text-green-700 font-medium">Contract Value</p>
+              <p className="text-lg font-bold text-slate-800">{contractDetails.contractValue}</p>
+            </div>
+            {contractDetails.daysRemaining !== undefined && (
+              <div className="bg-purple-50 border border-purple-100 rounded-xl p-4">
+                <p className="text-sm text-purple-700 font-medium">Days Remaining</p>
+                <p className="text-lg font-bold text-slate-800">{contractDetails.daysRemaining} days</p>
+              </div>
+            )}
           </div>
 
           {/* Main Deliverables */}
@@ -129,7 +214,7 @@ export default function Signature() {
                 Main Deliverables
             </h2>
             <ul className="space-y-3">
-              {deliverables.map((item, index) => (
+              {contractDetails.deliverables.map((item, index) => (
                 <li key={index} className="flex items-start">
                   <span className="h-2 w-2 bg-indigo-500 rounded-full mt-2 mr-4 flex-shrink-0"></span>
                   <span className="text-slate-600">{item}</span>
@@ -155,11 +240,13 @@ export default function Signature() {
                 Contract Progress Timeline
             </h2>
             <div className="w-full bg-slate-200 rounded-full h-2.5 mb-2">
-              <div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: '20%' }}></div>
+              <div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: `${contractDetails.progress}%` }}></div>
             </div>
             <div className="flex justify-between text-sm">
-              <p className="font-medium text-slate-600">20% Complete</p>
-              <p className="text-slate-500">First Milestone Reached</p>
+              <p className="font-medium text-slate-600">{contractDetails.progress}% Complete</p>
+              <p className="text-slate-500">
+                {contractDetails.milestones.filter(m => m.status === 'completed').length} of {contractDetails.milestones.length} milestones completed
+              </p>
             </div>
           </div>
         </div>
@@ -180,6 +267,21 @@ export default function Signature() {
                     </div>
                 ))}
             </div>
+
+            {/* Recent Notifications */}
+            {contractDetails.notifications.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold text-white mb-4">Recent Updates</h3>
+                <div className="space-y-3">
+                  {contractDetails.notifications.slice(0, 3).map((notification) => (
+                    <div key={notification.id} className="bg-slate-700 rounded-lg p-3">
+                      <p className="text-white text-sm font-medium">{notification.title}</p>
+                      <p className="text-slate-300 text-xs mt-1">{notification.message}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
         </div>
       </div>
     </div>
