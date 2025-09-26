@@ -22,7 +22,7 @@ export default function DashboardPage() {
                 <div className="flex-1">
                   <div className="text-sm font-semibold text-white">PT Vendor Teknologi</div>
                   <div className="mt-1 text-xs text-white">Vendor ID: VND-2024-001</div>
-                  <div className="mt-3 inline-flex items-center text-xs font-medium px-2 py-1 rounded-full bg-green-600 text-white">✓ Terverifikasi</div>
+                  <div className="mt-3 inline-flex items-center text-xs font-medium px-2 py-1 rounded-full bg-green-600 text-white">✓ Verified</div>
                 </div>
               </div>
             </div>
@@ -33,7 +33,7 @@ export default function DashboardPage() {
                   <DocumentChartBarIcon className="w-8 h-8" style={{ color: colors.primary[300] }} />
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm text-gray-500 mb-1">Kontrak Aktif</div>
+                  <div className="text-sm text-gray-500 mb-1">Active Contracts</div>
                   <div className="text-3xl font-bold text-gray-900 mb-1">247</div>
                   <div className="text-xs text-green-600 flex items-center gap-1">
                     <span>↗</span> +12%
@@ -48,10 +48,10 @@ export default function DashboardPage() {
                   <ExclamationTriangleIcon className="w-8 h-8 text-orange-500" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm text-gray-500 mb-1">Mendekati Expired</div>
+                  <div className="text-sm text-gray-500 mb-1">Expiring Soon</div>
                   <div className="text-3xl font-bold text-orange-500 mb-1">18</div>
                   <div className="text-xs text-orange-500 flex items-center gap-1">
-                    <span className="text-xs">30 hari</span>
+                    <span className="text-xs">30 days</span>
                   </div>
                 </div>
               </div>
@@ -63,9 +63,9 @@ export default function DashboardPage() {
               {/* Kontrak Aktif */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-semibold text-gray-900">Kontrak Aktif</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Active Contracts</h2>
                   <button className="text-sm font-medium" style={{ color: colors.primary[300] }}>
-                    Lihat Semua
+                    View All
                   </button>
                 </div>
 
@@ -77,7 +77,7 @@ export default function DashboardPage() {
                           <DocumentTextIcon className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <div className="font-medium text-gray-900">Kontrak Pemeliharaan</div>
+                          <div className="font-medium text-gray-900">Maintenance Contract</div>
                           <div className="text-sm text-gray-500">PT Service Pro - Rp 1.2M</div>
                         </div>
                       </div>
@@ -89,15 +89,15 @@ export default function DashboardPage() {
 
               {/* Notifikasi & Pengingat */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Notifikasi & Pengingat</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Notifications & Reminders</h3>
                 <div className="space-y-4">
                   {/* Expired Warning */}
                   <div className="p-4 rounded-lg bg-red-50 border border-red-200">
                     <div className="flex items-start gap-3">
                       <ExclamationTriangleIcon className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                       <div className="flex-1">
-                        <div className="font-medium text-red-900 text-sm">Kontrak akan berakhir dalam 15 hari</div>
-                        <div className="text-sm text-red-700 mt-1">Kontrak Layanan Kebersihan dengan PT Clean Service</div>
+                        <div className="font-medium text-red-900 text-sm">Contract will expire in 15 days</div>
+                        <div className="text-sm text-red-700 mt-1">Cleaning Service Contract with PT Clean Service</div>
                       </div>
                     </div>
                   </div>
@@ -107,8 +107,8 @@ export default function DashboardPage() {
                     <div className="flex items-start gap-3">
                       <ClockIcon className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
                       <div className="flex-1">
-                        <div className="font-medium text-orange-900 text-sm">Review hukum menunggu persetujuan</div>
-                        <div className="text-sm text-orange-700 mt-1">3 dokumen kontrak menunggu review dari tim hukum</div>
+                        <div className="font-medium text-orange-900 text-sm">Legal review pending approval</div>
+                        <div className="text-sm text-orange-700 mt-1">3 contract documents are awaiting legal team review</div>
                       </div>
                     </div>
                   </div>
@@ -117,8 +117,8 @@ export default function DashboardPage() {
                     <div className="flex items-start gap-3">
                       <ClockIcon className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
                       <div className="flex-1">
-                        <div className="font-medium text-orange-900 text-sm">Review hukum menunggu persetujuan</div>
-                        <div className="text-sm text-orange-700 mt-1">3 dokumen kontrak menunggu review dari tim hukum</div>
+                        <div className="font-medium text-orange-900 text-sm">Legal review pending approval</div>
+                        <div className="text-sm text-orange-700 mt-1">3 contract documents are awaiting legal team review</div>
                       </div>
                     </div>
                   </div>
@@ -127,7 +127,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Aksi Cepat</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <button
                   onClick={() => router.push("/dashboard/proposal/create")}
@@ -135,12 +135,12 @@ export default function DashboardPage() {
                   style={{ backgroundColor: colors.primary[300] }}
                 >
                   <PlusIcon className="w-4 h-4" />
-                  Ajukan Proposal Baru
+                  Submit New Proposal
                 </button>
 
                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border text-gray-700 hover:bg-gray-50 transition-colors" style={{ borderColor: colors.base[300] }}>
                   <ArrowDownTrayIcon className="w-4 h-4" />
-                  Export Laporan
+                  Export Report
                 </button>
               </div>
             </div>

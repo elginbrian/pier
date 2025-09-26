@@ -30,7 +30,7 @@ const CreateProposalPage: React.FC = () => {
     paymentTerms: "",
   });
 
-  const serviceOptions = ["Konsultasi Teknologi", "Pengembangan Software", "Maintenance & Support", "Integrasi Sistem", "Cloud Services"];
+  const serviceOptions = ["Technology Consultation", "Software Development", "Maintenance & Support", "System Integration", "Cloud Services"];
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
@@ -58,36 +58,36 @@ const CreateProposalPage: React.FC = () => {
     <div className="min-h-screen 0 py-8">
       <div className="w-full mx-auto">
         {/* Header Alert */}
-        <AlertBanner type="info" message="Pastikan semua data terisi lengkap sebelum Submit Proposal" className="mb-6" />
+        <AlertBanner type="info" message="Please ensure all fields are complete before submitting the proposal" className="mb-6" />
 
         {/* Page Header - Outside Cards */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Buat Proposal Baru</h1>
-          <p className="text-gray-600">Lengkapi formulir di bawah untuk mengajukan proposal penawaran</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Proposal</h1>
+          <p className="text-gray-600">Fill out the form below to submit your proposal</p>
         </div>
 
         {/* Form Sections - Each in its own card */}
         <div className="space-y-6">
           {/* Informasi Umum Card */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <FormSection stepNumber={1} title="Informasi Umum" icon="/info.svg">
+            <FormSection stepNumber={1} title="General Information" icon="/info.svg">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField label="Nama Perusahaan" required>
+                <FormField label="Company Name" required>
                   <Input type="text" value={formData.companyName} onChange={handleInputChange("companyName")} placeholder="PT Vendor Teknologi" />
                 </FormField>
 
-                <FormField label="Kontak PIC" required>
-                  <Input type="text" value={formData.contactPerson} onChange={handleInputChange("contactPerson")} placeholder="Nama Person in Charge" />
+                <FormField label="Contact Person" required>
+                  <Input type="text" value={formData.contactPerson} onChange={handleInputChange("contactPerson")} placeholder="Name of Person in Charge" />
                 </FormField>
 
                 <div className="md:col-span-2">
-                  <FormField label="Judul Proposal" required>
-                    <SmartTextarea value={formData.proposalTitle} onChange={handleInputChange("proposalTitle")} placeholder="Masukkan judul proposal yang jelas dan deskriptif" rows={3} />
+                  <FormField label="Proposal Title" required>
+                    <SmartTextarea value={formData.proposalTitle} onChange={handleInputChange("proposalTitle")} placeholder="Enter a clear and descriptive proposal title" rows={3} />
                   </FormField>
                 </div>
 
-                <FormField label="Jenis Layanan" required>
-                  <Dropdown options={serviceOptions} onSelect={(option) => handleDropdownChange("serviceType")(option)} label="Pilih jenis layanan" />
+                <FormField label="Service Type" required>
+                  <Dropdown options={serviceOptions} onSelect={(option) => handleDropdownChange("serviceType")(option)} label="Select service type" />
                 </FormField>
               </div>
             </FormSection>
@@ -95,14 +95,14 @@ const CreateProposalPage: React.FC = () => {
 
           {/* Detail Layanan Card */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <FormSection stepNumber={2} title="Detail Layanan" icon="/detail-service.svg">
+            <FormSection stepNumber={2} title="Service Details" icon="/detail-service.svg">
               <div className="space-y-6">
-                <FormField label="Spesifikasi Teknis" required>
-                  <SmartTextarea value={formData.technicalSpec} onChange={handleInputChange("technicalSpec")} placeholder="Deskripsikan detail spesifikasi teknis layanan yang ditawarkan..." rows={6} />
+                <FormField label="Technical Specification" required>
+                  <SmartTextarea value={formData.technicalSpec} onChange={handleInputChange("technicalSpec")} placeholder="Describe the technical specifications of the service being offered..." rows={6} />
                 </FormField>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField label="Tanggal Mulai" required>
+                  <FormField label="Start Date" required>
                     <input
                       type="date"
                       className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-black ${formData.startDate ? "border-green-300" : "border-gray-300"}`}
@@ -112,7 +112,7 @@ const CreateProposalPage: React.FC = () => {
                     />
                   </FormField>
 
-                  <FormField label="Tanggal Selesai" required>
+                  <FormField label="End Date" required>
                     <input
                       type="date"
                       className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-black ${formData.endDate ? "border-green-300" : "border-gray-300"}`}
@@ -128,14 +128,14 @@ const CreateProposalPage: React.FC = () => {
 
           {/* Anggaran & Biaya Card */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <FormSection stepNumber={3} title="Anggaran & Biaya" icon="/dollar.svg">
+            <FormSection stepNumber={3} title="Budget & Costs" icon="/dollar.svg">
               <div className="space-y-6">
-                <FormField label="Nilai Kontrak (Rp)" required>
+                <FormField label="Contract Value (Rp)" required>
                   <Input type="number" value={formData.contractValue} onChange={handleInputChange("contractValue")} placeholder="0" />
                 </FormField>
 
-                <FormField label="Rincian Termin Pembayaran" required>
-                  <SmartTextarea value={formData.paymentTerms} onChange={handleInputChange("paymentTerms")} placeholder="Deskripsikan pembagian termin pembayaran..." rows={4} />
+                <FormField label="Payment Terms Details" required>
+                  <SmartTextarea value={formData.paymentTerms} onChange={handleInputChange("paymentTerms")} placeholder="Describe the payment term breakdown..." rows={4} />
                 </FormField>
 
                 <LargeFileUpload label="Upload Proposal Harga" required onFileSelect={(file) => console.log("Price proposal:", file)} />
@@ -145,13 +145,13 @@ const CreateProposalPage: React.FC = () => {
 
           {/* Dokumen Pendukung Card */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <FormSection stepNumber={4} title="Dokumen Pendukung">
+            <FormSection stepNumber={4} title="Supporting Documents">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <ProposalFileUpload label="Akta Perusahaan" onFileSelect={(file) => console.log("Company certificate:", file)} />
+                <ProposalFileUpload label="Company Deed" onFileSelect={(file) => console.log("Company certificate:", file)} />
 
-                <ProposalFileUpload label="Izin Usaha" onFileSelect={(file) => console.log("Business license:", file)} />
+                <ProposalFileUpload label="Business License" onFileSelect={(file) => console.log("Business license:", file)} />
 
-                <ProposalFileUpload label="Portofolio" onFileSelect={(file) => console.log("Portfolio:", file)} />
+                <ProposalFileUpload label="Portfolio" onFileSelect={(file) => console.log("Portfolio:", file)} />
               </div>
             </FormSection>
           </div>
@@ -161,20 +161,20 @@ const CreateProposalPage: React.FC = () => {
             <div className="mb-4 md:mb-0 flex items-center">
               <Image src="/helper.svg" alt="Help" width={16} height={16} className="mr-2" />
               <p className="text-sm text-gray-600">
-                Butuh bantuan?{" "}
+                Need help?{" "}
                 <a href="#" className="text-blue-600 hover:underline">
-                  Lihat FAQ
+                  View FAQ
                 </a>{" "}
-                atau{" "}
+                or{" "}
                 <a href="#" className="text-blue-600 hover:underline">
-                  Hubungi Support
+                  Contact Support
                 </a>
               </p>
             </div>
 
             <div className="flex gap-3">
               <Button variant="secondary" size="md" onClick={handleSaveDraft}>
-                Simpan Draft
+                Save Draft
               </Button>
               <Button variant="primary" size="md" onClick={handleSubmit}>
                 Submit Proposal

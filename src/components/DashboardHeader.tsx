@@ -38,7 +38,7 @@ export default function DashboardHeader({ onOpenMenu }: Props) {
           <div className="flex items-center gap-4">
             <div className="relative hidden sm:block">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input placeholder="Cari kontrak..." className="pl-10 pr-4 py-2 rounded-lg border bg-white shadow-sm text-sm" style={{ borderColor: colors.base[200], minWidth: 220 }} />
+              <input placeholder="Search contracts..." className="pl-10 pr-4 py-2 rounded-lg border bg-white shadow-sm text-sm" style={{ borderColor: colors.base[200], minWidth: 220 }} />
             </div>
 
             <div className="hidden sm:flex items-center gap-3">
