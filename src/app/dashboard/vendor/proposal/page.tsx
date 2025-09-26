@@ -1,104 +1,132 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { colors } from "@/design-system";
+import { useAuth } from "@/context/AuthContext";
+import Spinner from "@/components/Spinner";
+import { ExclamationTriangleIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
+import {
+  subscribeToVendorData,
+  Contract,
+  Proposal,
+  DashboardStats,
+  Notification
+} from "@/services/dashboard";
 
 const ProposalPage = () => {
+  const router = useRouter();
+  const { user } = useAuth();
+  
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  
+  // Firebase data states
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [stats, setStats] = useState<DashboardStats>({
+    activeContracts: 0,
+    pendingProposals: 0,
+    expiringContracts: 0,
+    totalValue: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Chart data for Linimasa Kontrak
-  const chartData = [
-    { month: "Jan", aktif: 87, selesai: 65 },
-    { month: "Feb", aktif: 96, selesai: 58 },
-    { month: "Mar", aktif: 106, selesai: 45 },
-    { month: "Apr", aktif: 112, selesai: 41 },
-    { month: "Mei", aktif: 98, selesai: 44 },
-    { month: "Jun", aktif: 88, selesai: 54 },
-    { month: "Jul", aktif: 95, selesai: 56 },
-    { month: "Agu", aktif: 108, selesai: 46 },
-    { month: "Sep", aktif: 115, selesai: 40 },
-    { month: "Okt", aktif: 114, selesai: 35 },
-    { month: "Nov", aktif: 103, selesai: 45 },
-    { month: "Des", aktif: 84, selesai: 32 },
-  ];
+  // Filter proposals based on search term
+  const filteredProposals = proposals.filter(proposal =>
+    proposal.proposalTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    proposal.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    proposal.serviceType.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  // Active contracts data
-  const activeContracts = [
-    {
-      id: 1,
-      title: "Kontrak Pemeliharaan",
-      company: "PT Service Pro",
-      value: "Rp 1.2M",
-      daysLeft: 90,
-    },
-    {
-      id: 2,
-      title: "Kontrak Pemeliharaan",
-      company: "PT Service Pro",
-      value: "Rp 1.2M",
-      daysLeft: 90,
-    },
-    {
-      id: 3,
-      title: "Kontrak Pemeliharaan",
-      company: "PT Service Pro",
-      value: "Rp 1.2M",
-      daysLeft: 90,
-    },
-  ];
+  // Pagination
+  const itemsPerPage = 6;
+  const totalPages = Math.ceil(filteredProposals.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedProposals = filteredProposals.slice(startIndex, startIndex + itemsPerPage);
 
-  // Contract table data
-  const contractsData = [
-    {
-      id: "00001",
-      name: "KONTRAK 1",
-      amount: "Rp 8.7M",
-      expiry: "14 Feb 2025",
-      type: "Electric",
-      status: "Draft" as const,
-    },
-    {
-      id: "00002",
-      name: "KONTRAK 2",
-      amount: "Rp 8.7M",
-      expiry: "14 Feb 2025",
-      type: "Book",
-      status: "Diproses" as const,
-    },
-    {
-      id: "00003",
-      name: "KONTRAK 3",
-      amount: "Rp 8.7M",
-      expiry: "14 Feb 2025",
-      type: "Medicine",
-      status: "Ditolak" as const,
-    },
-    {
-      id: "00004",
-      name: "KONTRAK 4",
-      amount: "Rp 8.7M",
-      expiry: "14 Feb 2025",
-      type: "Mobile",
-      status: "Selesai" as const,
-    },
-    {
-      id: "00005",
-      name: "KONTRAK 5",
-      amount: "Rp 8.7M",
-      expiry: "14 Feb 2025",
-      type: "Watch",
-      status: "Diproses" as const,
-    },
-    {
-      id: "00006",
-      name: "KONTRAK 6",
-      amount: "Rp 8.7M",
-      expiry: "14 Feb 2025",
-      type: "Medicine",
-      status: "Selesai" as const,
-    },
-  ];
+  useEffect(() => {
+    if (!user?.uid) {
+      setLoading(false);
+      return;
+    }
+
+    console.log("[proposals] Setting up real-time data subscription for user:", user.uid);
+
+    try {
+      // Set up real-time data subscription
+      const unsubscribe = subscribeToVendorData(user.uid, (data) => {
+        console.log("[proposals] Real-time data update:", {
+          contracts: data.contracts.length,
+          proposals: data.proposals.length,
+          stats: data.stats
+        });
+
+        setContracts(data.contracts);
+        setProposals(data.proposals);
+        setStats(data.stats);
+        setLoading(false);
+        setError(null);
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    } catch (err: any) {
+      console.error("[proposals] Error setting up data subscription:", err);
+      setError(err?.message || "Failed to load proposal data");
+      setLoading(false);
+    }
+  }, [user]);
+
+  // Generate chart data from real contract data
+  const generateChartData = () => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const currentYear = new Date().getFullYear();
+    
+    return months.map(month => {
+      // For demo purposes, we'll use some calculated data based on real stats
+      // In a real app, you'd track historical data
+      const activeCount = Math.floor(Math.random() * 50) + stats.activeContracts;
+      const completedCount = Math.floor(Math.random() * 30) + 20;
+      
+      return {
+        month,
+        aktif: activeCount,
+        selesai: completedCount
+      };
+    });
+  };
+
+  const chartData = generateChartData();
+
+  // Filter active contracts from the contracts data
+  const activeContracts = contracts.filter(contract => 
+    contract.status === 'active' || contract.status === 'pending'
+  );
+
+  // Use real active contracts data
+  const activeContractsData = activeContracts.slice(0, 3).map((contract: Contract) => ({
+    id: contract.id,
+    title: contract.title,
+    company: contract.vendorName,
+    value: contract.contractValue,
+    daysLeft: contract.daysRemaining || 0,
+  }));
+
+  // Contract table data - use real proposals data
+  const contractsData = paginatedProposals.map(proposal => ({
+    id: proposal.id.substring(0, 6),
+    name: proposal.proposalTitle,
+    amount: proposal.contractValue || "Rp 0",
+    expiry: new Date(proposal.createdAt?.toDate?.() || proposal.createdAt).toLocaleDateString('id-ID'),
+    type: proposal.serviceType,
+    status: proposal.status === 'pending' ? 'Draft' as const :
+           proposal.status === 'under_review' ? 'Diproses' as const :
+           proposal.status === 'approved' ? 'Selesai' as const :
+           proposal.status === 'rejected' ? 'Ditolak' as const : 'Draft' as const,
+  }));
 
   const getStatusBadge = (status: "Draft" | "Diproses" | "Ditolak" | "Selesai") => {
     const statusConfig = {
@@ -120,6 +148,41 @@ const ProposalPage = () => {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
+
+  const handleCreateProposal = () => {
+    router.push('/dashboard/vendor/proposal/create');
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.base[100] }}>
+        <Spinner />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen p-6" style={{ backgroundColor: colors.base[100] }}>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          Error loading proposal data: {error}
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no user
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.base[100] }}>
+        <div className="text-center">
+          <p className="text-gray-600">Please log in to view proposals</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.base[100] }}>
@@ -193,7 +256,7 @@ const ProposalPage = () => {
             </div>
 
             <div>
-              {activeContracts.map((contract, index) => (
+              {activeContractsData.map((contract, index) => (
                 <div key={contract.id}>
                   <div className="p-6 flex items-center justify-between">
                     <div className="flex items-center space-x-4">
@@ -222,7 +285,7 @@ const ProposalPage = () => {
                       {contract.daysLeft} Hari
                     </span>
                   </div>
-                  {index < activeContracts.length - 1 && <div style={{ borderTop: `1px solid ${colors.base[200]}` }}></div>}
+                  {index < activeContractsData.length - 1 && <div style={{ borderTop: `1px solid ${colors.base[200]}` }}></div>}
                 </div>
               ))}
             </div>
