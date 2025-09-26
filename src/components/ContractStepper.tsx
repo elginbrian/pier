@@ -22,18 +22,29 @@ export default function ContractStepper({
           className="absolute top-8 left-8 right-8 h-0.5" 
           style={{ backgroundColor: colors.base[300] }}
         ></div>
-        {/* Progress line */}
-        <div 
-          className="absolute top-8 left-8 h-0.5 transition-all duration-300"
-          style={{ 
-            backgroundColor: isDeclined ? colors.error[400] : colors.primary[300],
-            width: isDeclined 
-              ? `calc(${(currentStep / (steps.length - 1)) * 100}% - 2rem)`
-              : currentStep >= steps.length - 1 
-              ? `calc(${((steps.length - 1) / (steps.length - 1)) * 100}% - 2rem - 32px)`
-              : `calc(${(currentStep / (steps.length - 1)) * 100}% - 2rem + 32px)`
-          }}
-        ></div>
+        
+        {/* Blue progress line (from start to step-1) */}
+        {currentStep > 0 && (
+          <div 
+            className="absolute top-8 left-8 h-0.5 transition-all duration-300"
+            style={{ 
+              backgroundColor: colors.primary[300],
+              width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - 2rem + 32px)`
+            }}
+          ></div>
+        )}
+        
+        {/* Red line (from step-1 to current) */}
+        {currentStep > 0 && (
+          <div 
+            className="absolute top-8 h-0.5 transition-all duration-300"
+            style={{ 
+              backgroundColor: colors.error[400],
+              left: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% + 32px)`,
+              width: `calc(${(1 / (steps.length - 1)) * 100}% - 32px)`
+            }}
+          ></div>
+        )}
         
         {steps.map((step, index) => {
           const isCompleted = index < currentStep;
@@ -48,7 +59,7 @@ export default function ContractStepper({
                   borderColor: isDeclinedStep
                     ? colors.error[400]
                     : (isDeclined && isCurrent)
-                    ? colors.error[400]
+                    ? colors.base[300]
                     : isCompleted 
                     ? colors.primary[400] 
                     : isCurrent 
@@ -70,22 +81,16 @@ export default function ContractStepper({
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="#ffffff">
                     <polyline points="20,6 9,17 4,12" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                ) : isCurrent ? (
-                  <div 
-                    className="w-4 h-4 rounded-full" 
-                    style={{ 
-                      backgroundColor: isDeclined ? colors.error[400] : colors.primary[300] 
-                    }}
-                  ></div>
                 ) : null}
               </div>
+              
               <p 
-                className="text-sm mt-3 text-center font-semibold"
+                className="text-sm text-center font-semibold"
                 style={{ 
                   color: isDeclinedStep
                     ? colors.error[400]
                     : (isDeclined && isCurrent)
-                    ? colors.error[400]
+                    ? colors.base[700]
                     : isCurrent 
                     ? colors.primary[300] 
                     : colors.base[700] 
