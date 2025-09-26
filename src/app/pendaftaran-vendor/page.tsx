@@ -16,9 +16,14 @@ import DocumentList from '../../components/DocumentList';
 import AdditionalInfo from '../../components/AdditionalInfo';
 import DocumentPreviewCard from '../../components/DocumentPreviewCard';
 import FileUploadField from '../../components/FileUploadField';
+import FormSendSuccessModal from '../../components/FormSendSuccessModal';
+import FormSendErrorModal from '../../components/FormSendErrorModal';
 
 export default function PendaftaranVendorPage() {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -34,13 +39,114 @@ export default function PendaftaranVendorPage() {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("Form submitted:", formData);
-    // Handle form submission
+    
+    // Form validation
+    if (!formData.tipeVendor || !formData.emailVendor || !formData.namaVendor || !formData.noNpwpVendor) {
+      setErrorMessage("Mohon lengkapi semua field yang wajib diisi.");
+      setIsErrorModalOpen(true);
+      return;
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.emailVendor)) {
+      setErrorMessage("Format email tidak valid.");
+      setIsErrorModalOpen(true);
+      return;
+    }
+    
+    // Document validation
+    if (!formData.dokumenAdmin || !formData.dokumenLegal || !formData.dokumenTeknikal || !formData.dokumenFinansial) {
+      setErrorMessage("Mohon upload semua dokumen yang diperlukan.");
+      setIsErrorModalOpen(true);
+      return;
+    }
+    
+    // File type validation (example for PDF only)
+    const allowedTypes = ['application/pdf'];
+    const documents = [
+      { file: formData.dokumenAdmin, name: 'Dokumen Administrasi' },
+      { file: formData.dokumenLegal, name: 'Dokumen Legal' },
+      { file: formData.dokumenTeknikal, name: 'Dokumen Teknikal' },
+      { file: formData.dokumenFinansial, name: 'Dokumen Finansial' }
+    ];
+    
+    for (const doc of documents) {
+      if (doc.file && !allowedTypes.includes(doc.file.type)) {
+        setErrorMessage(`${doc.name} harus berupa file PDF.`);
+        setIsErrorModalOpen(true);
+        return;
+      }
+      
+      // File size validation (5MB limit)
+      if (doc.file && doc.file.size > 5 * 1024 * 1024) {
+        setErrorMessage(`${doc.name} tidak boleh lebih dari 5MB.`);
+        setIsErrorModalOpen(true);
+        return;
+      }
+    }
+
+    try {
+      // Check internet connection first
+      if (!navigator.onLine) {
+        setErrorMessage("Tidak ada koneksi internet. Mohon periksa koneksi Anda.");
+        setIsErrorModalOpen(true);
+        return;
+      }
+      
+      // Simulate Firebase submission
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate different error scenarios
+          const random = Math.random();
+          if (random < 0.7) {
+            resolve('success');
+          } else if (random < 0.85) {
+            reject(new Error('Koneksi internet tidak stabil. Silakan coba lagi.'));
+          } else {
+            reject(new Error('Server sedang mengalami gangguan. Silakan coba beberapa saat lagi.'));
+          }
+        }, 1500);
+      });
+      
+      // If successful, show success notification
+      setIsModalOpen(true);
+      
+    } catch (error: any) {
+      // Handle different types of errors
+      if (error.message.includes('internet') || error.message.includes('network')) {
+        setErrorMessage("Koneksi internet bermasalah. Periksa koneksi Anda dan coba lagi.");
+      } else if (error.message.includes('server')) {
+        setErrorMessage("Server sedang sibuk. Mohon coba beberapa saat lagi.");
+      } else {
+        setErrorMessage(error.message || "Terjadi kesalahan yang tidak diketahui.");
+      }
+      setIsErrorModalOpen(true);
+    }
   };
 
   const handleVendorTypeSelect = (option: string) => {
     handleInputChange('tipeVendor', option);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+  };
+
+  const handleRetrySubmit = () => {
+    setIsErrorModalOpen(false);
+    handleSubmit();
+  };
+
+  const handleLoginRedirect = () => {
+    // Redirect to login page
+    window.location.href = '/auth/login';
   };
 
   // Document section content for accordion
@@ -220,6 +326,21 @@ export default function PendaftaranVendorPage() {
       </div>
 
       <Footer />
+      
+      {/* Success Modal */}
+      <FormSendSuccessModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onLogin={handleLoginRedirect}
+      />
+      
+      {/* Error Modal */}
+      <FormSendErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={handleCloseErrorModal}
+        onRetry={handleRetrySubmit}
+        message={errorMessage}
+      />
     </div>
   );
 }
