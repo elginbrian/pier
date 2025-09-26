@@ -99,7 +99,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       fontFamily: "inherit",
       paddingLeft: leftIcon ? "52px" : "20px",
       paddingRight: rightIcon ? "44px" : "20px",
-      color: disabled ? colors.disabled[500] : colors.base[700],
+      color: disabled ? colors.disabled[500] : "#000000", // Pure black for user input text
       cursor: disabled ? "not-allowed" : "text",
     };
 
