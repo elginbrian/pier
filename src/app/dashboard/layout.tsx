@@ -52,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <DashboardHeader onOpenMenu={() => setDrawerOpen(true)} />
-      <main className="w-full px-6 py-8 flex-1 pt-20">
+      <main className="w-full px-6 py-8 flex-1 pt-20" style={{ backgroundColor: "#f8fafc" }}>
         <div className="relative flex w-full">
           {drawerOpen && <div className="fixed inset-0 z-40 bg-black/30 md:hidden" onClick={() => setDrawerOpen(false)} aria-hidden />}
 
@@ -68,7 +68,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           )}
 
-          <div className="flex-1 md:pl-[260px]">
+          <div className="flex-1 w-full">
             <DashboardContainer>
               <div className="pt-6 md:pt-0">{children}</div>
             </DashboardContainer>
