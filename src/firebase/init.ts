@@ -13,36 +13,28 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-function assertFirebaseConfig(cfg: Record<string, any>) {
-  const missing = Object.entries(cfg)
-    .filter(([, v]) => !v)
-    .map(([k]) => k);
-  if (missing.length && typeof window !== "undefined") {
-    console.warn(`[firebase] missing env vars: ${missing.join(", ")}. Set NEXT_PUBLIC_FIREBASE_* in your environment.`);
-  }
-}
-
-let app: any = null;
-let auth: any = null;
+// Inisialisasi app hanya di client
+let app: ReturnType<typeof getApp> | null = null;
+let auth: ReturnType<typeof getAuth> | null = null;
 
 if (typeof window !== "undefined") {
-  assertFirebaseConfig(firebaseConfig);
-
-  try {
-    if (process.env.NODE_ENV !== "production") {
-      const pid = firebaseConfig.projectId ?? "<missing>";
-      const api = typeof firebaseConfig.apiKey === "string" ? firebaseConfig.apiKey.slice(0, 8) + "..." : "<missing>";
-      console.debug(`[firebase][dev] projectId=${pid} apiKeyPrefix=${api}`);
-    }
-  } catch (e) {
-    // silent
-  }
-
   if (!getApps().length) {
-    initializeApp(firebaseConfig as any);
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApp();
   }
-  app = getApp();
   auth = getAuth(app);
+}
+
+// Helper function supaya aman dipakai
+export function getFirebaseApp() {
+  if (!app) throw new Error("Firebase app belum diinisialisasi.");
+  return app;
+}
+
+export function getFirebaseAuth() {
+  if (!auth) throw new Error("Firebase Auth belum diinisialisasi.");
+  return auth;
 }
 
 export { app, auth };
