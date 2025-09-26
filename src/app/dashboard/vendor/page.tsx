@@ -130,7 +130,7 @@ export default function DashboardPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <button
-                  onClick={() => router.push("/dashboard/proposal/create")}
+                  onClick={() => router.push("/dashboard/vendor/proposal/create")}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-white transition-colors"
                   style={{ backgroundColor: colors.primary[300] }}
                 >

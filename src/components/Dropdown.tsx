@@ -6,6 +6,7 @@ const Dropdown = ({
   options = ["Label1", "Label2", "Label3", "Label4", "Label5"],
   onSelect = (_option: string, _index: number) => {},
   className = "",
+  error = "",
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -25,7 +26,9 @@ const Dropdown = ({
       {/* Dropdown Button */}
       <button
         onClick={toggleDropdown}
-        className={`w-full px-4 py-3 bg-white border-2 border-blue-500 flex items-center justify-between text-left hover:bg-gray-50 focus:outline-none focus:ring-2 transition-colors ${
+        className={`w-full px-4 py-3 bg-white border-2 flex items-center justify-between text-left hover:bg-gray-50 focus:outline-none focus:ring-2 transition-colors ${
+          error ? 'border-red-500' : 'border-blue-500'
+        } ${
           isOpen ? 'rounded-t-lg' : 'rounded-lg'
         }`}
         style={{ 
@@ -49,7 +52,9 @@ const Dropdown = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 bg-white border-2 border-t-0 border-blue-500 rounded-b-lg shadow-lg z-50 overflow-hidden">
+        <div className={`absolute top-full left-0 right-0 bg-white border-2 border-t-0 rounded-b-lg shadow-lg z-50 overflow-hidden ${
+          error ? 'border-red-500' : 'border-blue-500'
+        }`}>
           {options.map((option: string, index: number) => (
             <button
               key={index}
@@ -67,6 +72,10 @@ const Dropdown = ({
             </button>
           ))}
         </div>
+      )}
+      
+      {error && (
+        <p className="text-sm text-red-600 mt-1">{error}</p>
       )}
     </div>
   );
