@@ -10,6 +10,7 @@ import ContractAlert from "@/components/ContractAlert";
 import DeclinedContractUI from "@/components/DeclinedContractUI";
 import NormalContractForm from "@/components/NormalContractForm";
 import ContractStartedUI from "@/components/ContractStartedUI";
+import ContractSignatureUI from "@/components/ContractSignatureUI";
 import ContractCompletedUI from "@/components/ContractCompletedUI";
 import { getContractById, Contract, getVendorContracts } from "@/services/dashboard";
 import { getProposalById } from "@/services/proposals";
@@ -333,6 +334,15 @@ export default function ContractReviewPage() {
             <DeclinedContractUI />
           ) : contract.status === 'active' ? (
             <ContractStartedUI contractId={contract.id} />
+            ) : contract.status === 'approved' ? (
+            <ContractSignatureUI contractData={{
+              id: contract.id,
+              title: contract.title,
+              contractValue: contract.contractValue,
+              startDate: contract.startDate,
+              endDate: contract.endDate,
+              companyName: contract.vendorName || formData.companyName
+            }} />
           ) : (
             <NormalContractForm 
               formData={formData} 

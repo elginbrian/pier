@@ -1,5 +1,16 @@
 import React from 'react';
 
+interface ContractSignatureProps {
+  contractData?: {
+    id?: string;
+    title?: string;
+    contractValue?: string;
+    startDate?: string;
+    endDate?: string;
+    companyName?: string;
+  };
+}
+
 // --- SVG Icon Components ---
 // Self-contained icons for the new component.
 
@@ -52,7 +63,24 @@ const SignatureIcon = ({ className }: { className?: string }) => (
 );
 
 // --- Main Component ---
-export default function ContractSignature() {
+export default function ContractSignature({ contractData }: ContractSignatureProps) {
+    // Extract contract details with fallbacks
+    const contractNumber = contractData?.id?.substring(0, 8) || '#2025-04';
+    const projectName = contractData?.title || 'Sistem Logistik Terintegrasi';
+    const contractValue = contractData?.contractValue || 'Rp 2.5 Miliar';
+    const contractPeriod = calculatePeriod(contractData?.startDate, contractData?.endDate);
+    const companyName = contractData?.companyName || 'PT. Vendor';
+    
+    function calculatePeriod(startDate?: string, endDate?: string): string {
+        if (!startDate || !endDate) return '12 Bulan';
+        
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const monthsDiff = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+        
+        return `${monthsDiff} Bulan`;
+    }
+
     return (
         <div className="bg-slate-100 font-sans p-4 sm:p-6 lg:p-8 min-h-screen text-slate-800">
             <div className="max-w-7xl mx-auto">
@@ -68,19 +96,19 @@ export default function ContractSignature() {
                 <div className="bg-white rounded-2xl shadow-sm p-6 grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
                     <div>
                         <p className="text-sm text-slate-500">Nomor Kontrak</p>
-                        <p className="font-bold text-lg">#2025-04</p>
+                        <p className="font-bold text-lg">{contractNumber}</p>
                     </div>
                     <div>
                         <p className="text-sm text-slate-500">Nama Proyek</p>
-                        <p className="font-bold text-lg">Sistem Logistik Terintegrasi</p>
+                        <p className="font-bold text-lg">{projectName}</p>
                     </div>
                     <div>
                         <p className="text-sm text-slate-500">Nilai Kontrak</p>
-                        <p className="font-bold text-lg">Rp 2.5 Miliar</p>
+                        <p className="font-bold text-lg">{contractValue}</p>
                     </div>
                     <div>
                         <p className="text-sm text-slate-500">Periode</p>
-                        <p className="font-bold text-lg">12 Bulan</p>
+                        <p className="font-bold text-lg">{contractPeriod}</p>
                     </div>
                 </div>
 
@@ -105,7 +133,7 @@ export default function ContractSignature() {
                         <div className="bg-slate-50 rounded-lg flex flex-col items-center justify-center p-8 text-center min-h-[400px]">
                             <PdfIcon className="w-16 h-16 text-red-500 mb-4" />
                             <p className="font-semibold text-lg">Dokumen Kontrak PDF</p>
-                            <p className="text-sm text-slate-500 mb-6">Kontrak_ILCS_2025-04_Final.pdf</p>
+                            <p className="text-sm text-slate-500 mb-6">Kontrak_{companyName}_{contractNumber?.replace('#', '')}_Final.pdf</p>
                             <div className="bg-green-100 text-green-800 text-sm font-medium px-4 py-2 rounded-full flex items-center">
                                 <CheckCircleIcon className="w-4 h-4 mr-2" />
                                 Sudah ditandatangani ILCS
