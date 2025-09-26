@@ -321,7 +321,12 @@ export default function ContractReviewPage() {
           <ContractAlert isDeclined={isDeclined} />
 
           {/* Main Content */}
-          {isDeclined ? <DeclinedContractUI /> : <NormalContractForm formData={formData} onInputChange={handleInputChange} />}
+          {isDeclined ? <DeclinedContractUI /> : <NormalContractForm formData={formData} onInputChange={handleInputChange} documentUrls={{
+            proposalHargaUrl: (contract as any).proposalHargaUrl,
+            companyDeedUrl: (contract as any).companyDeedUrl,
+            businessLicenseUrl: (contract as any).businessLicenseUrl,
+            portfolioUrl: (contract as any).portfolioUrl
+          }} />}
         </>
       )}
     </main>

@@ -19,17 +19,25 @@ interface ContractFormData {
   paymentTerms: string;
 }
 
+interface DocumentUrls {
+  proposalHargaUrl?: string;
+  companyDeedUrl?: string;
+  businessLicenseUrl?: string;
+  portfolioUrl?: string;
+}
+
 interface NormalContractFormProps {
   formData: ContractFormData;
   onInputChange: (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  documentUrls?: DocumentUrls;
 }
 
-export default function NormalContractForm({ formData, onInputChange }: NormalContractFormProps) {
+export default function NormalContractForm({ formData, onInputChange, documentUrls = {} }: NormalContractFormProps) {
   const supportingDocuments = [
-    { label: "Akta Perusahaan", filename: "akta_perusahaan.pdf", size: "1.8 MB" },
-    { label: "Izin Usaha", filename: "izin_usaha.pdf", size: "0.9 MB" },
-    { label: "Portofolio", filename: "portfolio_perusahaan.pdf", size: "5.2 MB" }
-  ];
+    { label: "Akta Perusahaan", filename: "akta_perusahaan.pdf", size: "1.8 MB", urlKey: 'companyDeedUrl' as keyof DocumentUrls },
+    { label: "Izin Usaha", filename: "izin_usaha.pdf", size: "0.9 MB", urlKey: 'businessLicenseUrl' as keyof DocumentUrls },
+    { label: "Portofolio", filename: "portfolio_perusahaan.pdf", size: "5.2 MB", urlKey: 'portfolioUrl' as keyof DocumentUrls }
+  ].filter(doc => documentUrls[doc.urlKey]); // Only include documents that have URLs
 
   return (
     <>
@@ -169,46 +177,53 @@ export default function NormalContractForm({ formData, onInputChange }: NormalCo
                 />
               </FormField>
 
-              <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: colors.base[700] }}
-                >
-                  File Proposal Harga
-                  <span style={{ color: colors.primary[500] }} className="ml-1">
-                    <img src="/helper.svg" alt="Required" className="inline w-4 h-4" />
-                  </span>
-                </label>
-                <DocumentUpload
-                  filename="proposal_harga_sistem_dcms.pdf"
-                  size="2.3 MB"
-                />
-              </div>
+              {/* File Proposal Harga - Only show if file exists */}
+              {documentUrls.proposalHargaUrl && (
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.base[700] }}
+                  >
+                    File Proposal Harga
+                    <span style={{ color: colors.primary[500] }} className="ml-1">
+                      <img src="/helper.svg" alt="Required" className="inline w-4 h-4" />
+                    </span>
+                  </label>
+                  <DocumentUpload
+                    filename="proposal_harga_sistem_dcms.pdf"
+                    size="2.3 MB"
+                    fileUrl={documentUrls.proposalHargaUrl}
+                  />
+                </div>
+              )}
             </div>
           </FormSection>
         </div>
 
-        {/* Dokumen Pendukung Card */}
-        <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: '#ffffff' }}>
-          <FormSection title="Dokumen Pendukung">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {supportingDocuments.map((doc) => (
-                <div key={doc.label}>
-                  <label
-                    className="block text-sm font-medium mb-3"
-                    style={{ color: colors.base[700] }}
-                  >
-                    {doc.label}
-                  </label>
-                  <DocumentUpload
-                    filename={doc.filename}
-                    size={doc.size}
-                  />
-                </div>
-              ))}
-            </div>
-          </FormSection>
-        </div>
+        {/* Dokumen Pendukung Card - Only show if there are documents */}
+        {supportingDocuments.length > 0 && (
+          <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: '#ffffff' }}>
+            <FormSection title="Dokumen Pendukung">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {supportingDocuments.map((doc) => (
+                  <div key={doc.label}>
+                    <label
+                      className="block text-sm font-medium mb-3"
+                      style={{ color: colors.base[700] }}
+                    >
+                      {doc.label}
+                    </label>
+                    <DocumentUpload
+                      filename={doc.filename}
+                      size={doc.size}
+                      fileUrl={documentUrls[doc.urlKey]}
+                    />
+                  </div>
+                ))}
+              </div>
+            </FormSection>
+          </div>
+        )}
 
         {/* Action Buttons Card */}
         <div className="flex flex-col items-center justify-center text-center">

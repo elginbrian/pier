@@ -8,21 +8,30 @@ interface DocumentUploadProps {
   size: string;
   isUploaded?: boolean;
   className?: string;
+  fileUrl?: string;
 }
 
 export default function DocumentUpload({ 
   filename, 
   size, 
   isUploaded = true, 
-  className = "" 
+  className = "",
+  fileUrl
 }: DocumentUploadProps) {
+  
+  const handleFileClick = () => {
+    if (fileUrl) {
+      window.open(fileUrl, '_blank');
+    }
+  };
   return (
     <div
-      className={`rounded-lg p-6 text-center ${className}`}
+      className={`rounded-lg p-6 text-center ${className} ${fileUrl ? 'cursor-pointer hover:bg-opacity-80 transition-colors' : ''}`}
       style={{
         border: `1px solid ${colors.base[200]}`,
         backgroundColor: colors.base[100]
       }}
+      onClick={handleFileClick}
     >
       <div className="mb-4">
         <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center">
@@ -52,6 +61,11 @@ export default function DocumentUpload({
         style={{ color: colors.base[500] }}
       >
         {size} - {isUploaded ? 'Uploaded' : 'Pending'}
+        {fileUrl && (
+          <span className="block text-xs mt-1" style={{ color: colors.primary[600] }}>
+            Click to view file
+          </span>
+        )}
       </p>
     </div>
   );
