@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { colors } from "@/design-system";
+import dashboardService from "@/services/dashboard";
 
 const ManagementContractPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -9,17 +10,38 @@ const ManagementContractPage = () => {
   const [selectedStatus, setSelectedStatus] = useState("Semua Status");
   const [selectedRisiko, setSelectedRisiko] = useState("Level Risiko");
   const [currentPage, setCurrentPage] = useState(1);
+  const [contractsData, setContractsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const contractsData = new Array(9).fill(null).map((_, i) => ({
-    id: `SC00${i + 1}`,
-    judul: `Kontrak Penjualan Properti`,
-    pihak: `PT. Maju Bersama`,
-    tanggalBuat: `15 Jan 2024`,
-    tanggalBerakhir: `15 Jan 2025`,
-    status: i === 0 ? "Aktif" : i === 8 ? "Berakhir" : "Pending",
-    tag: i % 2 === 0 ? "Properti" : "Sewa",
-    level: i === 8 ? "Risiko Tinggi" : i % 3 === 0 ? "Risiko Rendah" : "Risiko Sedang",
-  }));
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    dashboardService
+      .getAllContracts()
+      .then((list: any[]) => {
+        if (!mounted) return;
+        setContractsData(
+          list.map((c: any) => ({
+            id: c.id,
+            judul: c.title,
+            pihak: c.vendorName,
+            tanggalBuat: c.startDate || "-",
+            tanggalBerakhir: c.endDate || "-",
+            status: c.status === "active" ? "Aktif" : c.status === "expired" ? "Berakhir" : c.status === "pending" ? "Pending" : c.status,
+            tag: c.tag && c.tag.join ? c.tag.join(", ") : c.tag || "-",
+            level: c.level || "-",
+          }))
+        );
+      })
+      .catch((e: any) => {
+        console.error("Failed to load contracts for management", e);
+      })
+      .finally(() => setLoading(false));
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { bg: string; text: string }> = {
@@ -92,8 +114,8 @@ const ManagementContractPage = () => {
             borderRadius: "0.8rem",
           }}
         >
-          <div className="flex flex-col lg:flex-row gap-4" >
-            <div className="flex-1" >
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
               <div className="relative">
                 <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: colors.base[400] }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -149,11 +171,13 @@ const ManagementContractPage = () => {
         </div>
 
         <div className="bg-white">
-          <div className="overflow-x-auto"
+          <div
+            className="overflow-x-auto"
             style={{
               border: `1px solid ${colors.base[200]}`,
               borderRadius: "0.8rem",
-            }}>
+            }}
+          >
             <table className="min-w-full">
               <thead>
                 <tr style={{ borderBottom: `1px solid ${colors.base[200]}`, backgroundColor: colors.base[100] }}>
@@ -217,27 +241,13 @@ const ManagementContractPage = () => {
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-2">
                         <button className="p-1 rounded transition-colors" title="See details">
-                          <img
-                            src="/eye-open.svg"
-                            alt="See details"
-                            className="w-8 h-8 rounded-lg object-contain"
-                          />
+                          <img src="/eye-open.svg" alt="See details" className="w-8 h-8 rounded-lg object-contain" />
                         </button>
                         <button className="p-1 rounded transition-colors" title="Download">
-                          <img
-                            src="/download-draft.svg"
-                            alt="Download"
-                            className="w-8 h-8 rounded-lg object-contain"
-                            style={{ filter: `invert(30%) sepia(100%) saturate(0%) hue-rotate(170deg) brightness(90%) contrast(85%)` }}
-                          />
+                          <img src="/download-draft.svg" alt="Download" className="w-8 h-8 rounded-lg object-contain" style={{ filter: `invert(30%) sepia(100%) saturate(0%) hue-rotate(170deg) brightness(90%) contrast(85%)` }} />
                         </button>
                         <button className="p-1 rounded transition-colors" title="Edit">
-                          <img
-                            src="/pencil.svg"
-                            alt="Edit"
-                            className="w-8 h-8 rounded-lg object-contain"
-                            style={{ filter: `invert(90%) sepia(0%) saturate(0%) hue-rotate(0deg)` }}
-                          />
+                          <img src="/pencil.svg" alt="Edit" className="w-8 h-8 rounded-lg object-contain" style={{ filter: `invert(90%) sepia(0%) saturate(0%) hue-rotate(0deg)` }} />
                         </button>
                       </div>
                     </td>

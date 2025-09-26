@@ -746,4 +746,99 @@ export default {
   updateContractProgress,
   addContractMilestone,
   getContractMilestones,
+
+  async getAllContracts() {
+    try {
+      const contractsQuery = query(collection(db, "contracts"));
+      const querySnapshot = await getDocs(contractsQuery);
+      const contracts: Contract[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        contracts.push({
+          id: doc.id,
+          title: data.title || data.proposalTitle || "Untitled Contract",
+          vendorName: data.companyName || data.vendorName || "Unknown Vendor",
+          contractValue: data.contractValue || "0",
+          startDate: data.startDate || "",
+          endDate: data.endDate || "",
+          status: data.status || "pending",
+          createdAt: data.createdAt,
+        } as Contract);
+      });
+
+      contracts.sort((a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0;
+        return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
+      });
+
+      return contracts;
+    } catch (e) {
+      console.error("[dashboard] getAllContracts error", e);
+      return [];
+    }
+  },
+
+  subscribeToAllData(onUpdate: (data: { contracts: Contract[]; proposals: Proposal[]; stats: DashboardStats; notifications: Notification[] }) => void) {
+    try {
+      const contractsQuery = query(collection(db, "contracts"));
+      const proposalsQuery = query(collection(db, "proposals"));
+
+      let contracts: Contract[] = [];
+      let proposals: Proposal[] = [];
+
+      const updateData = () => {
+        // sort client-side
+        contracts.sort((a, b) => {
+          if (!a.createdAt || !b.createdAt) return 0;
+          return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
+        });
+        proposals.sort((a, b) => {
+          if (!a.createdAt || !b.createdAt) return 0;
+          return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
+        });
+
+        const stats = calculateDashboardStats(contracts, proposals);
+        const notifications = generateNotifications(contracts, proposals);
+        onUpdate({ contracts, proposals, stats, notifications });
+      };
+
+      const unsubContracts = onSnapshot(contractsQuery, (snapshot) => {
+        contracts = [];
+        snapshot.forEach((d) => {
+          const data = d.data();
+          contracts.push({
+            id: d.id,
+            title: data.title || data.proposalTitle || "Untitled Contract",
+            vendorName: data.companyName || data.vendorName || "Unknown Vendor",
+            contractValue: data.contractValue || "0",
+            startDate: data.startDate || "",
+            endDate: data.endDate || "",
+            status: data.status || "pending",
+            createdAt: data.createdAt,
+          } as Contract);
+        });
+        updateData();
+      });
+
+      const unsubProposals = onSnapshot(proposalsQuery, (snapshot) => {
+        proposals = [];
+        snapshot.forEach((d) => {
+          proposals.push({ id: d.id, ...(d.data() as any) } as Proposal);
+        });
+        updateData();
+      });
+
+      return () => {
+        try {
+          unsubContracts();
+        } catch (e) {}
+        try {
+          unsubProposals();
+        } catch (e) {}
+      };
+    } catch (e) {
+      console.error("[dashboard] subscribeToAllData error", e);
+      return () => {};
+    }
+  },
 };

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { colors } from "@/design-system";
+import dashboardService from "@/services/dashboard";
 
 const ManagementContractActivePage = () => {
   const router = useRouter();
@@ -14,16 +15,36 @@ const ManagementContractActivePage = () => {
     router.push(`/dashboard/management/contract/active/detail?id=${contractId}`);
   };
 
-  const contractsData = useMemo(
-    () => [
-      { id: "KTR-001", judul: "Kontrak Layanan IT", pihak: "PT Teknologi Maju", waktu: "21.00 25 September 2025", warna: colors.primary[600] },
-      { id: "KTR-002", judul: "Kontrak Konstruksi Gudang", pihak: "PT Bangun Jaya", waktu: "16.00 25 September 2005", warna: colors.warning[600] },
-      { id: "KTR-003", judul: "Kontrak Pemeliharaan", pihak: "PT Service Pro", waktu: "13.00 25 September 2025", warna: colors.primary[600] },
-      { id: "KTR-004", judul: "Kontrak Pemeliharaan", pihak: "PT Service Pro", waktu: "13.00 25 September 2025", warna: colors.primary[600] },
-      { id: "KTR-005", judul: "Kontrak Pemeliharaan", pihak: "PT Service Pro", waktu: "13.00 25 September 2025", warna: colors.primary[600] },
-    ],
-    []
-  );
+  const [contractsData, setContractsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    dashboardService
+      .getAllContracts()
+      .then((list: any[]) => {
+        if (!mounted) return;
+        const active = list
+          .filter((c) => c.status === "active")
+          .map((c) => ({
+            id: c.id,
+            judul: c.title,
+            pihak: c.vendorName,
+            waktu: c.endDate || c.startDate || "-",
+            warna: colors.primary[600],
+          }));
+        setContractsData(active);
+      })
+      .catch((e: any) => console.error("Failed to load active contracts", e))
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const filtered = contractsData.filter((c) => {
     if (!searchTerm) return true;
@@ -88,31 +109,34 @@ const ManagementContractActivePage = () => {
 
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="space-y-3">
-            {filtered.map((c, idx) => (
-              <div 
-                key={c.id} 
-                className="flex items-center justify-between bg-transparent p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors" 
-                style={{ borderBottom: idx < filtered.length - 1 ? `1px solid ${colors.base[100]}` : "none" }}
-                onClick={() => handleContractClick(c.id)}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ backgroundColor: c.warna }}>
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h8v10H8z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 7v10" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium" style={{ color: colors.base[700] }}>
-                      {c.judul}
+            {loading ? (
+              <div className="p-6 text-center text-slate-500">Loading contracts...</div>
+            ) : (
+              filtered.map((c, idx) => (
+                <div
+                  key={c.id}
+                  className="flex items-center justify-between bg-transparent p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                  style={{ borderBottom: idx < filtered.length - 1 ? `1px solid ${colors.base[100]}` : "none" }}
+                  onClick={() => handleContractClick(c.id)}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ backgroundColor: c.warna }}>
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h8v10H8z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 7v10" />
+                      </svg>
                     </div>
-                    <div className="text-xs mt-1" style={{ color: colors.base[600] }}>
-                      {c.pihak} - {c.waktu}
+                    <div>
+                      <div className="text-sm font-medium" style={{ color: colors.base[700] }}>
+                        {c.judul}
+                      </div>
+                      <div className="text-xs mt-1" style={{ color: colors.base[600] }}>
+                        {c.pihak} - {c.waktu}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div>
+                  <div>
                     <button
                       className="px-4 py-2 rounded-full text-sm font-medium hover:opacity-95 transition-opacity"
                       style={{ backgroundColor: colors.primary[700], color: "#ffffff" }}
@@ -123,9 +147,10 @@ const ManagementContractActivePage = () => {
                     >
                       Lihat Kontrak Aktif
                     </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>

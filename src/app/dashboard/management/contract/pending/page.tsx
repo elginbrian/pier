@@ -1,29 +1,40 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { colors } from "@/design-system";
+import dashboardService from "@/services/dashboard";
 
 const PendingContractsPage = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterWaktu, setFilterWaktu] = useState("Waktu");
   const [filterStatus, setFilterStatus] = useState("Semua Status");
+  const [contractsData, setContractsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const handleContractClick = (contractId: string) => {
     router.push(`/dashboard/management/contract/pending/detail?id=${contractId}`);
   };
 
-  const contractsData = useMemo(
-    () => [
-      { id: "KTR-001", judul: "Kontrak Layanan IT", pihak: "PT Teknologi Maju", waktu: "21.00 25 September 2025", warna: colors.primary[600] },
-      { id: "KTR-002", judul: "Kontrak Konstruksi Gudang", pihak: "PT Bangun Jaya", waktu: "16.00 25 September 2005", warna: colors.warning[600] },
-      { id: "KTR-003", judul: "Kontrak Pemeliharaan", pihak: "PT Service Pro", waktu: "13.00 25 September 2025", warna: colors.primary[600] },
-      { id: "KTR-004", judul: "Kontrak Pemeliharaan", pihak: "PT Service Pro", waktu: "13.00 25 September 2025", warna: colors.primary[600] },
-      { id: "KTR-005", judul: "Kontrak Pemeliharaan", pihak: "PT Service Pro", waktu: "13.00 25 September 2025", warna: colors.primary[600] },
-    ],
-    []
-  );
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    dashboardService
+      .getAllContracts()
+      .then((list: any[]) => {
+        if (!mounted) return;
+        // filter pending
+        const pending = list.filter((c) => c.status === "pending" || c.status === "under_review").map((c) => ({ id: c.id, judul: c.title, pihak: c.vendorName, waktu: c.startDate || "-", warna: colors.primary[600] }));
+        setContractsData(pending);
+      })
+      .catch((e: any) => console.error("Failed to load management pending contracts", e))
+      .finally(() => setLoading(false));
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const filtered = contractsData.filter((c) => {
     if (!searchTerm) return true;
@@ -89,9 +100,9 @@ const PendingContractsPage = () => {
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="space-y-3">
             {filtered.map((c, idx) => (
-              <div 
-                key={c.id} 
-                className="flex items-center justify-between bg-transparent p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors" 
+              <div
+                key={c.id}
+                className="flex items-center justify-between bg-transparent p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                 style={{ borderBottom: idx < filtered.length - 1 ? `1px solid ${colors.base[100]}` : "none" }}
                 onClick={() => handleContractClick(c.id)}
               >
@@ -113,12 +124,12 @@ const PendingContractsPage = () => {
                 </div>
 
                 <div>
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleContractClick(c.id);
                     }}
-                    className="px-4 py-2 rounded-full text-sm font-medium hover:opacity-95 transition-opacity" 
+                    className="px-4 py-2 rounded-full text-sm font-medium hover:opacity-95 transition-opacity"
                     style={{ backgroundColor: colors.primary[700], color: "#ffffff" }}
                   >
                     Lihat Kontrak
