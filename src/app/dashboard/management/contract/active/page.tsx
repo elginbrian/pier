@@ -102,9 +102,13 @@ const ManagementContractActivePage = () => {
                 </div>
 
                 <div>
-                  <button className="px-4 py-2 rounded-full text-sm font-medium hover:opacity-95" style={{ backgroundColor: colors.primary[700], color: "#ffffff" }}>
-                    Lihat Kontrak
-                  </button>
+                    <button
+                      className="px-4 py-2 rounded-full text-sm font-medium hover:opacity-95"
+                      style={{ backgroundColor: colors.primary[700], color: "#ffffff" }}
+                      onClick={() => window.location.href = `/dashboard/management/contract/active/detail`}
+                    >
+                      Lihat Kontrak Aktif
+                    </button>
                 </div>
               </div>
             ))}
