@@ -1,7 +1,7 @@
 "use client";
 
 import { app } from "../firebase/init";
-import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, onSnapshot, doc, updateDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, onSnapshot, doc, updateDoc, getDoc } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export type ProposalPayload = {
@@ -53,7 +53,7 @@ export async function submitProposal(payload: ProposalPayload, files?: Record<st
     }
   }
 
-  const doc: any = {
+  const docPayload: any = {
     companyName: payload.companyName,
     contactPerson: payload.contactPerson,
     proposalTitle: payload.proposalTitle,
@@ -67,16 +67,16 @@ export async function submitProposal(payload: ProposalPayload, files?: Record<st
     createdAt: serverTimestamp(),
   };
 
-  if (payload.userId) doc.userId = payload.userId;
+  if (payload.userId) docPayload.userId = payload.userId;
 
-  if (fileUploads["proposalHarga"]) doc.proposalHargaUrl = fileUploads["proposalHarga"];
-  if (fileUploads["companyDeed"]) doc.companyDeedUrl = fileUploads["companyDeed"];
-  if (fileUploads["businessLicense"]) doc.businessLicenseUrl = fileUploads["businessLicense"];
-  if (fileUploads["portfolio"]) doc.portfolioUrl = fileUploads["portfolio"];
+  if (fileUploads["proposalHarga"]) docPayload.proposalHargaUrl = fileUploads["proposalHarga"];
+  if (fileUploads["companyDeed"]) docPayload.companyDeedUrl = fileUploads["companyDeed"];
+  if (fileUploads["businessLicense"]) docPayload.businessLicenseUrl = fileUploads["businessLicense"];
+  if (fileUploads["portfolio"]) docPayload.portfolioUrl = fileUploads["portfolio"];
 
   const col = collection(db, "proposals");
-  const ref = await addDoc(col, doc);
-  return { id: ref.id, ...doc };
+  const ref = await addDoc(col, docPayload);
+  return { id: ref.id, ...docPayload };
 }
 
 export async function getAllProposals(statusFilter?: string[]) {
@@ -101,19 +101,29 @@ export async function getAllProposals(statusFilter?: string[]) {
   }
 }
 
-export async function getProposalById(id: string) {
+export async function getProposalById(proposalId: string): Promise<any | null> {
   try {
-    const d = doc(db, "proposals", id);
-    const snap = await getDocs(query(collection(db, "proposals"), where("__name__", "==", id)));
+    console.log("[proposals] Getting proposal by ID:", proposalId);
 
-    if (!snap || snap.empty) {
+    const proposalDoc = doc(db, "proposals", proposalId);
+    const proposalSnapshot = await getDoc(proposalDoc);
+
+    if (!proposalSnapshot.exists()) {
+      console.log("[proposals] Proposal not found:", proposalId);
       return null;
     }
-    const data = snap.docs[0].data();
-    return { id: snap.docs[0].id, ...data };
-  } catch (e) {
-    console.error("Failed to fetch proposal by id", e);
-    throw e;
+
+    const data = proposalSnapshot.data();
+    const proposal = {
+      id: proposalSnapshot.id,
+      ...data,
+    };
+
+    console.log("[proposals] Found proposal:", proposal);
+    return proposal;
+  } catch (error) {
+    console.error("[proposals] Error getting proposal by ID:", error);
+    return null;
   }
 }
 
@@ -162,4 +172,5 @@ export async function updateProposalStatus(proposalId: string, status: string, r
 
 export default {
   submitProposal,
+  getProposalById,
 };

@@ -1,12 +1,18 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { colors } from "@/design-system";
 
 const PendingContractsPage = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterWaktu, setFilterWaktu] = useState("Waktu");
   const [filterStatus, setFilterStatus] = useState("Semua Status");
+
+  const handleContractClick = (contractId: string) => {
+    router.push(`/dashboard/management/contract/pending/detail?id=${contractId}`);
+  };
 
   const contractsData = useMemo(
     () => [
@@ -83,7 +89,12 @@ const PendingContractsPage = () => {
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="space-y-3">
             {filtered.map((c, idx) => (
-              <div key={c.id} className="flex items-center justify-between bg-transparent p-3 rounded-lg" style={{ borderBottom: idx < filtered.length - 1 ? `1px solid ${colors.base[100]}` : "none" }}>
+              <div 
+                key={c.id} 
+                className="flex items-center justify-between bg-transparent p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors" 
+                style={{ borderBottom: idx < filtered.length - 1 ? `1px solid ${colors.base[100]}` : "none" }}
+                onClick={() => handleContractClick(c.id)}
+              >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ backgroundColor: c.warna }}>
                     <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +113,14 @@ const PendingContractsPage = () => {
                 </div>
 
                 <div>
-                  <button className="px-4 py-2 rounded-full text-sm font-medium hover:opacity-95" style={{ backgroundColor: colors.primary[700], color: "#ffffff" }}>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleContractClick(c.id);
+                    }}
+                    className="px-4 py-2 rounded-full text-sm font-medium hover:opacity-95 transition-opacity" 
+                    style={{ backgroundColor: colors.primary[700], color: "#ffffff" }}
+                  >
                     Lihat Kontrak
                   </button>
                 </div>

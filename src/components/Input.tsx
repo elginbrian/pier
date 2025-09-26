@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       switch (variant) {
         case "bordered":
           base.border = `1px solid ${colors.base[300]}`;
-          base.backgroundColor = colors.base[100];
+          base.backgroundColor = "transparent";
           break;
         case "ghost":
           base.border = "none";
@@ -55,7 +55,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           break;
         default:
           base.border = `1px solid ${colors.base[200]}`;
-          base.backgroundColor = colors.base[100];
+          base.backgroundColor = "transparent";
           break;
       }
 
@@ -79,7 +79,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         }
       } else {
         base.borderColor = colors.disabled[300];
-        base.backgroundColor = colors.disabled[100];
+        base.backgroundColor = "transparent";
         base.cursor = "not-allowed";
       }
 
