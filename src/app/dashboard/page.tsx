@@ -16,7 +16,7 @@ export default function DashboardRedirectPage() {
       return;
     }
 
-    const dest = user.role === "hukum" ? "/dashboard/hukum" : "/dashboard/vendor";
+    const dest = user.role === "hukum" ? "/dashboard/hukum" : user.role === "manajemen" || user.role === "management" ? "/dashboard/management" : "/dashboard/vendor";
     router.replace(dest);
   }, [user, loading, router]);
 

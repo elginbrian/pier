@@ -19,7 +19,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   if (user) {
-    const destination = user.role === "hukum" ? "/dashboard/hukum" : "/dashboard/vendor";
+    const destination = user.role === "hukum" ? "/dashboard/hukum" : user.role === "manajemen" || user.role === "management" ? "/dashboard/management" : "/dashboard/vendor";
     router.replace(destination);
   }
 
@@ -35,7 +35,7 @@ export default function LoginPage() {
       const u = await signIn(identifier, password);
       showToast("success", "Successfully signed in");
 
-      const dest = u?.role === "hukum" ? "/dashboard/hukum" : "/dashboard/vendor";
+      const dest = u?.role === "hukum" ? "/dashboard/hukum" : u?.role === "manajemen" || u?.role === "management" ? "/dashboard/management" : "/dashboard/vendor";
       router.push(dest);
     } catch (err: any) {
       const msg = err?.message || "Failed to sign in";

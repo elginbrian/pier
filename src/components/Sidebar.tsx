@@ -17,20 +17,38 @@ const Sidebar: React.FC<SidebarProps> = ({ className = "", onClose }) => {
 
   const { user } = useAuth();
 
-  const dashboardHref = user ? (user.role === "hukum" ? "/dashboard/hukum" : "/dashboard/vendor") : "/auth/login";
-  const secondHref = user ? (user.role === "hukum" ? "/dashboard/hukum/detail-pengajuan" : "/dashboard/vendor/proposal") : "/auth/login";
+  let navItems: { href: string; label: string; icon: React.ReactNode }[] = [];
 
-  const navItems: { href: string; label: string; icon: React.ReactNode }[] = [
-    { href: dashboardHref, label: "Dashboard", icon: <FiBarChart2 size={18} /> },
-    { href: secondHref, label: user?.role === "hukum" ? "Detail Pengajuan" : "Proposal", icon: <FiFileText size={18} /> },
-  ];
+  if (!user) {
+    navItems = [
+      { href: "/auth/login", label: "Dashboard", icon: <FiBarChart2 size={18} /> },
+      { href: "/auth/login", label: "Proposal", icon: <FiFileText size={18} /> },
+    ];
+  } else if (user.role === "hukum") {
+    navItems = [
+      { href: "/dashboard/hukum", label: "Dashboard", icon: <FiBarChart2 size={18} /> },
+      { href: "/dashboard/hukum/detail-pengajuan", label: "Detail Pengajuan", icon: <FiFileText size={18} /> },
+    ];
+  } else if (user.role === "manajemen" || user.role === "management") {
+    navItems = [
+      { href: "/dashboard/management", label: "Dashboard", icon: <FiBarChart2 size={18} /> },
+      { href: "/dashboard/management/contract", label: "Daftar Kontrak", icon: <FiList size={18} /> },
+      { href: "/dashboard/management/contract/monitoring", label: "Monitoring Kontrak", icon: <FiFileText size={18} /> },
+      { href: "/dashboard/management/contract/pending", label: "Kontrak Pending", icon: <FiFileText size={18} /> },
+      { href: "/dashboard/management/contract/active", label: "Kontrak Aktif", icon: <FiFileText size={18} /> },
+    ];
+  } else {
+    navItems = [
+      { href: "/dashboard/vendor", label: "Dashboard", icon: <FiBarChart2 size={18} /> },
+      { href: "/dashboard/vendor/proposal", label: "Proposal", icon: <FiFileText size={18} /> },
+    ];
+  }
 
   const rootClass = onClose ? `block md:hidden ${className}` : `hidden md:block fixed left-0 top-0 bottom-0 z-40 ${className}`;
 
   return (
     <aside className={rootClass} style={{ width: 260 }}>
       <div className="flex flex-col h-full overflow-y-auto bg-white border-r border-gray-100" style={{ boxShadow: "0 6px 20px rgba(16,24,40,0.06)" }}>
-        {/* Mobile close button - visible when sidebar is used as a drawer (onClose provided) */}
         {onClose && (
           <div className="md:hidden flex items-center justify-end px-4 pt-4">
             <button aria-label="close menu" onClick={onClose} className="p-2 rounded-md border bg-white shadow-sm" style={{ borderColor: colors.base[300] }}>

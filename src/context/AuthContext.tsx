@@ -51,12 +51,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       if (!u) {
         setUser(null);
+
+        try {
+          document.cookie = `pier_user=; Path=/; Max-Age=0; SameSite=Lax;`;
+        } catch (e) {}
         setLoading(false);
         return;
       }
 
       const { role } = await ensureUserDoc(u as authService.User);
       setUser({ ...(u as authService.User), role });
+
+      try {
+        const payload = JSON.stringify({ uid: (u as authService.User).uid, role });
+
+        const expires = new Date(Date.now() + 1000 * 60 * 60).toUTCString();
+
+        const secure = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
+        document.cookie = `pier_user=${encodeURIComponent(payload)}; Path=/; Expires=${expires}; SameSite=Lax${secure}`;
+      } catch (e) {
+        console.warn("Failed to set pier_user cookie", e);
+      }
       setLoading(false);
     });
 
@@ -84,6 +99,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const role = await loadRoleForUid(u.uid);
       const appUser: AppUser = { ...u, role };
       setUser(appUser);
+      try {
+        const payload = JSON.stringify({ uid: u.uid, role });
+        const expires = new Date(Date.now() + 1000 * 60 * 60).toUTCString();
+        const secure = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
+        document.cookie = `pier_user=${encodeURIComponent(payload)}; Path=/; Expires=${expires}; SameSite=Lax${secure}`;
+      } catch (e) {
+        console.warn("Failed to set pier_user cookie on signUp", e);
+      }
       return appUser;
     },
     signIn: async (email: string, password: string) => {
@@ -91,11 +114,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const role = await loadRoleForUid(u.uid);
       const appUser: AppUser = { ...u, role };
       setUser(appUser);
+      try {
+        const payload = JSON.stringify({ uid: u.uid, role });
+        const expires = new Date(Date.now() + 1000 * 60 * 60).toUTCString();
+        const secure = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
+        document.cookie = `pier_user=${encodeURIComponent(payload)}; Path=/; Expires=${expires}; SameSite=Lax${secure}`;
+      } catch (e) {
+        console.warn("Failed to set pier_user cookie on signIn", e);
+      }
       return appUser;
     },
     signOut: async () => {
       await authService.signOut();
       setUser(null);
+      try {
+        document.cookie = `pier_user=; Path=/; Max-Age=0; SameSite=Lax;`;
+      } catch (e) {
+        // ignore
+      }
     },
     requestPasswordReset: async (email: string) => await authService.requestPasswordReset(email),
   };
