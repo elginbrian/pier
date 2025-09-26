@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Button from "./Button";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 
 interface NavigationProps {
   className?: string;
@@ -11,6 +12,7 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ className = "" }) => {
   const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
+  const { user, signOut } = useAuth();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +27,6 @@ const Navigation: React.FC<NavigationProps> = ({ className = "" }) => {
             <img src="/logo-pelindo.png" alt="Pelindo Logo" className="h-8 w-auto" />
           </div>
 
-          {/* Search Bar */}
           <div className="flex-1 max-w-xl mx-6">
             <form onSubmit={handleSearch} className="relative">
               <input
@@ -43,7 +44,6 @@ const Navigation: React.FC<NavigationProps> = ({ className = "" }) => {
             </form>
           </div>
 
-          {/* Navigation Links */}
           <div className="hidden md:block">
             <div className="ml-6 flex items-baseline space-x-6">
               <a href="#" className="text-gray-700 hover:text-blue-600 px-2 py-1 text-sm font-medium transition-colors">
@@ -61,11 +61,32 @@ const Navigation: React.FC<NavigationProps> = ({ className = "" }) => {
             </div>
           </div>
 
-          {/* Login Button */}
-          <div className="ml-4">
-            <Button variant="primary" size="sm" onClick={() => router.push("/auth/login")}>
-              Login
-            </Button>
+          <div className="ml-4 flex items-center gap-3">
+            {!user ? (
+              <Button variant="primary" size="sm" onClick={() => router.push("/auth/login")}>
+                Login
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" onClick={() => router.push("/dashboard")}>
+                  Dashboard
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      await signOut();
+                      router.replace("/");
+                    } catch (e) {
+                      console.error("Logout failed", e);
+                    }
+                  }}
+                >
+                  Logout
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

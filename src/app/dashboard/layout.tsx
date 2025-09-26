@@ -1,15 +1,21 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Navigation from "../../components/Navigation";
+import Spinner from "../../components/Spinner";
 import Sidebar from "../../components/Sidebar";
 import Footer from "../../components/Footer";
 import { colors } from "../../design-system";
 import DashboardHeader from "../../components/DashboardHeader";
+import { useAuth } from "../../context/AuthContext";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -18,6 +24,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/auth/login");
+    }
+  }, [loading, user, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-sm text-gray-600">Loading…</div>
+      </div>
+    );
+  }
+
+  if (!loading && !user)
+    return (
+      <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div>
+          <Spinner size={48} />
+        </div>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">

@@ -5,6 +5,10 @@
   --foreground: #171717;
 }
 
+html {
+  background: var(--background);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
