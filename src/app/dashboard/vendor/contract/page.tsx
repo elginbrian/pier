@@ -10,6 +10,7 @@ import ContractAlert from "@/components/ContractAlert";
 import DeclinedContractUI from "@/components/DeclinedContractUI";
 import NormalContractForm from "@/components/NormalContractForm";
 import ContractStartedUI from "@/components/ContractStartedUI";
+import ContractCompletedUI from "@/components/ContractCompletedUI";
 import { getContractById, Contract, getVendorContracts } from "@/services/dashboard";
 import { getProposalById } from "@/services/proposals";
 
@@ -314,15 +315,21 @@ export default function ContractReviewPage() {
           <h2 className="text-2xl font-bold mb-2" style={{ color: colors.base[700] }}>
             {contract.status === 'pending' ? 'Status Proposal' : 'Status Kontrak'} - {contract.title}
           </h2>
-          <div className="my-6">
-            <ContractStepper currentStep={currentStep} isDeclined={isDeclined} declinedStep={declinedStep} />
-          </div>
+          
+          {/* Only show stepper if not expired */}
+          {contract.status !== 'expired' && (
+            <div className="my-6">
+              <ContractStepper currentStep={currentStep} isDeclined={isDeclined} declinedStep={declinedStep} />
+            </div>
+          )}
 
           {/* Alert Section for Declined Contract */}
-          <ContractAlert isDeclined={isDeclined} />
+          {contract.status !== 'expired' && <ContractAlert isDeclined={isDeclined} />}
 
           {/* Main Content */}
-          {isDeclined ? (
+          {contract.status === 'expired' ? (
+            <ContractCompletedUI />
+          ) : isDeclined ? (
             <DeclinedContractUI />
           ) : contract.status === 'active' ? (
             <ContractStartedUI />
