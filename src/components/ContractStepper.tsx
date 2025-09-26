@@ -23,19 +23,21 @@ export default function ContractStepper({
           style={{ backgroundColor: colors.base[300] }}
         ></div>
         
-        {/* Blue progress line (from start to step-1) */}
+        {/* Blue progress line (from start to current step) */}
         {currentStep > 0 && (
           <div 
             className="absolute top-8 left-8 h-0.5 transition-all duration-300"
             style={{ 
               backgroundColor: colors.primary[300],
-              width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - 2rem + 32px)`
+              width: isDeclined 
+                ? `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - 2rem + 32px)`
+                : `calc(${(currentStep / (steps.length - 1)) * 100}% - 2rem + 32px)`
             }}
           ></div>
         )}
         
-        {/* Red line (from step-1 to current) */}
-        {currentStep > 0 && (
+        {/* Red line (from step-1 to current) - only show if declined */}
+        {currentStep > 0 && isDeclined && (
           <div 
             className="absolute top-8 h-0.5 transition-all duration-300"
             style={{ 
@@ -81,6 +83,13 @@ export default function ContractStepper({
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="#ffffff">
                     <polyline points="20,6 9,17 4,12" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
+                ) : isCurrent && !isDeclined ? (
+                  <div 
+                    className="w-4 h-4 rounded-full" 
+                    style={{ 
+                      backgroundColor: colors.primary[300] 
+                    }}
+                  ></div>
                 ) : null}
               </div>
               
