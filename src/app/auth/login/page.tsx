@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import Input from "../../../components/Input";
+import Button from "../../../components/Button";
+import { FiUser, FiLock, FiLogIn } from 'react-icons/fi';
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
 import { useToasts } from "../../../components/ToastProvider";
@@ -54,13 +56,26 @@ export default function LoginPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-10">
             <div className="flex flex-col items-center gap-4 mb-6">
               <Image src="/logo-pelindo.png" alt="PIER logo" width={120} height={36} />
-              <h1 className="text-4xl font-semibold text-[color:var(--pier-primary-700)]">LOGIN</h1>
+              <h1 className="text-4xl font-bold text-[color:var(--pier-primary-700)]">LOGIN</h1>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <Input label="Username / Email" placeholder="Masukkan username atau email" value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
+              <Input
+                label="Username / Email"
+                placeholder="Masukkan username atau email"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                leftIcon={<FiUser />}
+              />
 
-              <Input label="Password" placeholder="Masukkan password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                label="Password"
+                placeholder="Masukkan password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                leftIcon={<FiLock />}
+              />
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -74,9 +89,9 @@ export default function LoginPage() {
 
               {error && <div className="text-sm text-red-600">{error}</div>}
 
-              <button disabled={loading} type="submit" className="w-full bg-[color:var(--pier-primary-700)] text-white py-3 rounded-md font-medium hover:brightness-95">
+              <Button type="submit" disabled={loading} className="w-full py-3 rounded-md font-medium hover:brightness-95" leftIcon={<FiLogIn />}> 
                 {loading ? "Masuk..." : "Masuk"}
-              </button>
+              </Button>
             </form>
 
             <p className="text-center text-sm text-gray-600 mt-6">

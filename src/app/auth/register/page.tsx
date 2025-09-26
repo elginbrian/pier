@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import Input from "../../../components/Input";
+import Button from "../../../components/Button";
+import { FiUser, FiMail, FiLock } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
 import { useToasts } from "../../../components/ToastProvider";
@@ -55,21 +57,21 @@ export default function RegisterPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-10">
             <div className="flex flex-col items-center gap-4 mb-6">
               <Image src="/logo-pelindo.png" alt="PIER logo" width={120} height={36} />
-              <h1 className="text-3xl font-semibold text-[color:var(--pier-primary-700)]">REGISTER</h1>
+              <h1 className="text-3xl font-bold text-[color:var(--pier-primary-700)]">REGISTER</h1>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <Input label="Full name" placeholder="Nama lengkap" value={fullname} onChange={(e) => setFullname(e.target.value)} />
+              <Input label="Full name" placeholder="Nama lengkap" value={fullname} onChange={(e) => setFullname(e.target.value)} leftIcon={<FiUser />} />
 
-              <Input label="Email" placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input label="Email" placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} leftIcon={<FiMail />} />
 
-              <Input label="Password" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input label="Password" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} leftIcon={<FiLock />} />
 
               {error && <div className="text-sm text-red-600">{error}</div>}
 
-              <button disabled={loading} type="submit" className="w-full bg-[color:var(--pier-primary-700)] text-white py-3 rounded-md font-medium hover:brightness-95">
+              <Button type="submit" disabled={loading} className="w-full bg-[color:var(--pier-primary-700)] text-white py-3 rounded-md font-medium hover:brightness-95">
                 {loading ? "Mendaftarkan..." : "Daftar"}
-              </button>
+              </Button>
             </form>
 
             <p className="text-center text-sm text-gray-600 mt-6">
