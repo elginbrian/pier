@@ -148,7 +148,7 @@ export default function ClientVendorRegistrationPage() {
         </div>
         <div className="mb-12">
           <div className="flex items-center mb-6">
-            <h2 className="text-2xl font-bold mr-4" style={{ color: colors.primary[300] }}>
+            <h2 className="text-2xl font-bold mr-4" style={{ color: colors.base[100], backgroundColor: colors.primary[300] }}>
               What to prepare?
             </h2>
           </div>
@@ -162,7 +162,13 @@ export default function ClientVendorRegistrationPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {DOCUMENT_PREVIEWS.map((doc, index) => (
-              <DocumentPreviewCard key={index} title={doc.title} filename={doc.filename} preview={doc.preview} />
+              <DocumentPreviewCard 
+                key={index} 
+                title={doc.title} 
+                filename={doc.filename} 
+                preview={doc.preview}
+                downloadUrl={doc.downloadUrl}
+              />
             ))}
           </div>
         </div>
@@ -172,112 +178,107 @@ export default function ClientVendorRegistrationPage() {
             Registration Form
           </h3>
 
-          <div className="bg-white rounded-lg p-8 shadow-sm border">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: colors.base[700] }}>
-                  Vendor Type <span style={{ color: colors.error[400] }}>*</span>
-                </label>
-                <Dropdown
-                  label="Select vendor type..."
-                  options={VENDOR_TYPES}
-                  onSelect={(option) => {
-                    handleVendorTypeSelect(option);
-                    markTouched("tipeVendor" as any);
-                  }}
-                  className="w-full"
-                />
-              </div>
-
-              <Input
-                label="Vendor Email"
-                type="email"
-                placeholder="Enter vendor email..."
-                value={formData.emailVendor}
-                onChange={(e) => handleInputChange("emailVendor", e.target.value)}
-                onBlur={() => markTouched("emailVendor" as any)}
-                error={errors.emailVendor}
-                required
-              />
-
-              <Input
-                label="Vendor Name"
-                placeholder="Enter vendor name..."
-                value={formData.namaVendor}
-                onChange={(e) => handleInputChange("namaVendor", e.target.value)}
-                onBlur={() => markTouched("namaVendor" as any)}
-                error={errors.namaVendor}
-                required
-              />
-
-              <Input
-                label="Vendor Phone Number"
-                placeholder="Enter vendor phone number..."
-                value={formData.noNpwpVendor}
-                onChange={(e) => handleInputChange("noNpwpVendor", e.target.value)}
-                onBlur={() => markTouched("noNpwpVendor" as any)}
-                error={errors.noNpwpVendor}
-                required
+          <div className="grid md:grid-cols-1 gap-6">
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: colors.base[700] }}>
+                Vendor Type <span style={{ color: colors.error[400] }}>*</span>
+              </label>
+              <Dropdown
+                label="Select vendor type..."
+                options={VENDOR_TYPES}
+                onSelect={(option) => {
+                  handleVendorTypeSelect(option);
+                  markTouched("tipeVendor" as any);
+                }}
+                className="w-full"
               />
             </div>
+
+            <Input
+              label={<span className="font-bold">Vendor Email</span>}
+              type="email"
+              placeholder="Enter vendor email..."
+              value={formData.emailVendor}
+              onChange={(e) => handleInputChange("emailVendor", e.target.value)}
+              onBlur={() => markTouched("emailVendor" as any)}
+              error={errors.emailVendor}
+              required
+            />
+
+            <Input
+              label={<span className="font-bold">Vendor Name</span>}
+              placeholder="Enter vendor name..."
+              value={formData.namaVendor}
+              onChange={(e) => handleInputChange("namaVendor", e.target.value)}
+              onBlur={() => markTouched("namaVendor" as any)}
+              error={errors.namaVendor}
+              required
+            />
+
+            <Input
+              label={<span className="font-bold">Vendor Phone Number</span>}
+              placeholder="Enter vendor phone number..."
+              value={formData.noNpwpVendor}
+              onChange={(e) => handleInputChange("noNpwpVendor", e.target.value)}
+              onBlur={() => markTouched("noNpwpVendor" as any)}
+              error={errors.noNpwpVendor}
+              required
+            />
           </div>
         </div>
-
         <div className="mb-12">
           <h3 className="text-xl font-semibold mb-6" style={{ color: colors.base[700] }}>
             Upload Documents
           </h3>
 
-          <div className="bg-white rounded-lg p-8 shadow-sm border">
-            <div className="">
-              <FileUploadField
-                label="Administrative Document"
-                fieldName="dokumen-admin"
-                fieldKey="dokumenAdmin"
-                file={formData.dokumenAdmin}
-                onFileChange={(k, f) => {
-                  handleFileChange(k, f);
-                  markTouched("dokumenAdmin" as any);
-                }}
-                error={errors.dokumenAdmin}
-              />
+          <div className="">
+            <FileUploadField
+              label={<span className="font-bold">Administrative Document</span>}
+              fieldName="dokumen-admin"
+              fieldKey="dokumenAdmin"
+              file={formData.dokumenAdmin}
+              onFileChange={(k, f) => {
+                handleFileChange(k, f);
+                markTouched("dokumenAdmin" as any);
+              }}
+              error={errors.dokumenAdmin}
+            />
 
-              <FileUploadField
-                label="Legal Document"
-                fieldName="dokumen-legal"
-                fieldKey="dokumenLegal"
-                file={formData.dokumenLegal}
-                onFileChange={(k, f) => {
-                  handleFileChange(k, f);
-                  markTouched("dokumenLegal" as any);
-                }}
-                error={errors.dokumenLegal}
-              />
+            <FileUploadField
+              label={<span className="font-bold">Legal Document</span>}
+              fieldName="dokumen-legal"
+              fieldKey="dokumenLegal"
+              file={formData.dokumenLegal}
+              onFileChange={(k, f) => {
+                handleFileChange(k, f);
+                markTouched("dokumenLegal" as any);
+              }}
+              error={errors.dokumenLegal}
+            />
 
-              <FileUploadField
-                label="Technical Document"
-                fieldName="dokumen-teknikal"
-                fieldKey="dokumenTeknikal"
-                file={formData.dokumenTeknikal}
-                onFileChange={(k, f) => {
-                  handleFileChange(k, f);
-                  markTouched("dokumenTeknikal" as any);
-                }}
-                error={errors.dokumenTeknikal}
-              />
+            <FileUploadField
+              label={<span className="font-bold">Technical Document</span>}
+              fieldName="dokumen-teknikal"
+              fieldKey="dokumenTeknikal"
+              file={formData.dokumenTeknikal}
+              onFileChange={(k, f) => {
+                handleFileChange(k, f);
+                markTouched("dokumenTeknikal" as any);
+              }}
+              error={errors.dokumenTeknikal}
+            />
 
-              <FileUploadField
-                label="Financial Document"
-                fieldName="dokumen-finansial"
-                fieldKey="dokumenFinansial"
-                file={formData.dokumenFinansial}
-                onFileChange={(k, f) => {
-                  handleFileChange(k, f);
-                  markTouched("dokumenFinansial" as any);
-                }}
-                error={errors.dokumenFinansial}
-              />
-            </div>
+            <FileUploadField
+              label={<span className="font-bold">Financial Document</span>}
+              fieldName="dokumen-finansial"
+              fieldKey="dokumenFinansial"
+              file={formData.dokumenFinansial}
+              onFileChange={(k, f) => {
+                handleFileChange(k, f);
+                markTouched("dokumenFinansial" as any);
+              }}
+              error={errors.dokumenFinansial}
+            />
           </div>
         </div>
 

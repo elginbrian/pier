@@ -11,7 +11,7 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({ descriptions }) => (
         key={index} 
         className={index === 2 ? "text-gray-700 font-medium" : "text-gray-700"}
       >
-        {desc}
+       • {desc}
       </p>
     ))}
   </div>

@@ -25,13 +25,13 @@ export default function Accordion({ items }: { items: AccordionItem[] }) {
 
   return (
     <div className="w-full">
-      <div className="space-y-3">
+      <div className="space-y-5">
         {items?.map((item) => {
           const isOpen = openId === item.id;
           return (
-            <div key={item.id} className={`bg-white rounded-lg shadow-sm border ${isOpen ? "ring-2 ring-indigo-50" : ""}`}>
+            <div key={item.id} className={`rounded-xl shadow-md`} style={{ backgroundColor: colors.base[100] }}>
               <div className="flex">
-                <div style={{ backgroundColor: isOpen ? colors.primary[300] : "transparent" }} className={`w-1 rounded-l-lg`} />
+                <div className={`w-1 rounded-l-lg`} />
                 <div className="flex-1">
                   <button
                     type="button"
@@ -42,20 +42,14 @@ export default function Accordion({ items }: { items: AccordionItem[] }) {
                     onKeyDown={(e) => onKeyDown(e, item.id)}
                     className="w-full text-left px-6 py-5 flex items-center justify-between focus:outline-none"
                   >
-                    <span style={{ color: isOpen ? colors.primary[300] : undefined }} className={`text-lg font-semibold ${isOpen ? "" : "text-gray-900"}`}>
+                    <span className={`text-lg font-semibold`}>
                       {item.title}
                     </span>
-                    <svg
-                      className={`w-5 h-5 text-gray-500 transform transition-transform duration-200 ${isOpen ? "rotate-180" : "rotate-0"}`}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                      aria-hidden
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <img
+                      src="/arrow-bottom.svg"
+                      alt="Arrow Bottom"
+                      className={`w-8 h-8 rounded-lg object-contain transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+                    />
                   </button>
 
                   <div id={`panel-${item.id}`} role="region" aria-labelledby={`accordion-${item.id}`} className={`px-6 overflow-hidden transition-[max-height] duration-300 ${isOpen ? "max-h-96 py-4" : "max-h-0"}`}>
@@ -70,5 +64,3 @@ export default function Accordion({ items }: { items: AccordionItem[] }) {
     </div>
   );
 }
-
-// (merged conflict resolved: kept the top implementation)
