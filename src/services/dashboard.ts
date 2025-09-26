@@ -3,6 +3,7 @@
 import { app } from "../firebase/init";
 import { getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, updateDoc, serverTimestamp, orderBy, limit, onSnapshot, Timestamp } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadString, getDownloadURL } from "firebase/storage";
+import { setDoc } from "firebase/firestore";
 
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -162,6 +163,98 @@ export async function getContractById(contractId: string): Promise<Contract | nu
   } catch (error) {
     console.error("[dashboard] Error getting contract by ID:", error);
     return null;
+  }
+}
+
+export function subscribeToContract(contractId: string, onUpdate: (contract: Contract | null) => void) {
+  try {
+    const contractDoc = doc(db, "contracts", contractId);
+    const unsubscribe = onSnapshot(
+      contractDoc,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          onUpdate(null);
+          return;
+        }
+
+        const data = snapshot.data();
+        const contract: Contract = {
+          id: snapshot.id,
+          title: data.title || data.proposalTitle || "Untitled Contract",
+          vendorName: data.companyName || data.vendorName || "Unknown Vendor",
+          contractValue: data.contractValue || "0",
+          startDate: data.startDate || "",
+          endDate: data.endDate || "",
+          status: data.status || "pending",
+          createdAt: data.createdAt,
+        };
+
+        if (contract.status === "active" && contract.endDate) {
+          const endDate = new Date(contract.endDate);
+          const today = new Date();
+          const diffTime = endDate.getTime() - today.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          contract.daysRemaining = diffDays > 0 ? diffDays : 0;
+        }
+
+        onUpdate(contract);
+      },
+      (err) => {
+        console.error("[dashboard] subscribeToContract error", err);
+      }
+    );
+
+    return unsubscribe;
+  } catch (error) {
+    console.error("[dashboard] Failed to subscribe to contract", error);
+    return () => {};
+  }
+}
+
+// Subscribe to a single proposal document and map it to a contract-like object
+export function subscribeToProposal(proposalId: string, onUpdate: (contractLike: Contract | null) => void) {
+  try {
+    const proposalDoc = doc(db, "proposals", proposalId);
+    const unsubscribe = onSnapshot(
+      proposalDoc,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          onUpdate(null);
+          return;
+        }
+
+        const data: any = snapshot.data();
+        const mapped: Contract = {
+          id: snapshot.id,
+          title: data.proposalTitle || data.title || "Untitled Proposal",
+          vendorName: data.companyName || data.vendorName || "Unknown Vendor",
+          contractValue: data.contractValue || "0",
+          startDate: data.startDate || "",
+          endDate: data.endDate || "",
+          status:
+            data.status === "pending"
+              ? ("pending" as const)
+              : data.status === "under_review"
+              ? ("under_review" as const)
+              : data.status === "approved"
+              ? ("approved" as const)
+              : data.status === "rejected"
+              ? ("rejected" as const)
+              : ("pending" as const),
+          createdAt: data.createdAt,
+        };
+
+        onUpdate(mapped);
+      },
+      (err) => {
+        console.error("[dashboard] subscribeToProposal error", err);
+      }
+    );
+
+    return unsubscribe;
+  } catch (error) {
+    console.error("[dashboard] Failed to subscribe to proposal", error);
+    return () => {};
   }
 }
 
@@ -388,13 +481,30 @@ export async function getContractDetails(contractId: string): Promise<ContractDe
     const contractDoc = doc(db, "contracts", contractId);
     const contractSnapshot = await getDoc(contractDoc);
 
+    let data: any = null;
+
     if (!contractSnapshot.exists()) {
-      console.log("[dashboard] Contract not found:", contractId);
-      return null;
+      console.log("[dashboard] Contract not found, trying proposal fallback:", contractId);
+      try {
+        const proposalDoc = doc(db, "proposals", contractId);
+        const proposalSnap = await getDoc(proposalDoc);
+        if (!proposalSnap.exists()) {
+          console.log("[dashboard] Neither contract nor proposal found:", contractId);
+          return null;
+        }
+        data = proposalSnap.data();
+        // normalize status mapping from proposal->contract-like
+        data.status = data.status === "approved" ? "approved" : data.status === "under_review" ? "under_review" : data.status === "rejected" ? "rejected" : "pending";
+        // leave title/proposalTitle handling to below
+      } catch (e) {
+        console.error("[dashboard] Error checking proposal fallback", e);
+        return null;
+      }
+    } else {
+      data = contractSnapshot.data();
     }
 
-    const data = contractSnapshot.data();
-
+    // Fetch milestones and notifications even for proposal fallback (likely empty)
     const milestonesQuery = query(collection(db, "contract_milestones"), where("contractId", "==", contractId));
 
     const milestonesSnapshot = await getDocs(milestonesQuery);
@@ -425,24 +535,23 @@ export async function getContractDetails(contractId: string): Promise<ContractDe
     const progress = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
 
     const contractDetails: ContractDetails = {
-      id: contractSnapshot.id,
-      title: data.title || data.proposalTitle || "Untitled Contract",
-      vendorName: data.companyName || data.vendorName || "Unknown Vendor",
-      contractValue: data.contractValue || "0",
-      startDate: data.startDate || "",
-      endDate: data.endDate || "",
-      status: data.status || "pending",
-      createdAt: data.createdAt,
-      deliverables: data.deliverables || ["Implementation of integrated logistics management system", "Operational team training and maintenance", "Technical documentation and user manual", "Support and maintenance for 12 months"],
+      id: contractSnapshot.exists() ? contractSnapshot.id : contractId,
+      title: data?.title || data?.proposalTitle || "Untitled Contract",
+      vendorName: data?.companyName || data?.vendorName || "Unknown Vendor",
+      contractValue: data?.contractValue || "0",
+      startDate: data?.startDate || "",
+      endDate: data?.endDate || "",
+      status: data?.status || "pending",
+      createdAt: data?.createdAt,
+      deliverables: data?.deliverables || ["Implementation of integrated logistics management system", "Operational team training and maintenance", "Technical documentation and user manual", "Support and maintenance for 12 months"],
       milestones,
       progress: Math.round(progress),
-      slaRequirements: data.slaRequirements || ["System uptime minimum 99.5%", "Response time maximum 24 hours", "Monthly performance reports"],
-      technicalSpec: data.technicalSpec || "",
-      paymentTerms: data.paymentTerms || "",
+      slaRequirements: data?.slaRequirements || ["System uptime minimum 99.5%", "Response time maximum 24 hours", "Monthly performance reports"],
+      technicalSpec: data?.technicalSpec || "",
+      paymentTerms: data?.paymentTerms || "",
       notifications,
     };
 
-    // Calculate days remaining if contract is active
     if (contractDetails.status === "active" && contractDetails.endDate) {
       const endDate = new Date(contractDetails.endDate);
       const today = new Date();
@@ -459,7 +568,6 @@ export async function getContractDetails(contractId: string): Promise<ContractDe
   }
 }
 
-// Update contract progress
 export async function updateContractProgress(contractId: string, progress: number): Promise<boolean> {
   try {
     const contractDoc = doc(db, "contracts", contractId);
@@ -513,12 +621,72 @@ export async function uploadVendorSignature(contractId: string, dataUrl: string)
 
     // Update contract doc with signature metadata and set status active
     const contractDoc = doc(db, "contracts", contractId);
-    await updateDoc(contractDoc, {
-      vendorSignatureUrl: url,
-      vendorSignedAt: serverTimestamp(),
-      status: "active",
-      updatedAt: serverTimestamp(),
-    });
+    const contractSnapshot = await getDoc(contractDoc);
+
+    if (contractSnapshot.exists()) {
+      await updateDoc(contractDoc, {
+        vendorSignatureUrl: url,
+        vendorSignedAt: serverTimestamp(),
+        status: "active",
+        updatedAt: serverTimestamp(),
+      });
+    } else {
+      // Contract doc doesn't exist. Try to create a contract doc from a proposal if available,
+      // otherwise create a minimal contract document so that update succeeds.
+      try {
+        const proposalDoc = doc(db, "proposals", contractId);
+        const proposalSnap = await getDoc(proposalDoc);
+
+        const newContractPayload: any = {
+          title: "Untitled Contract",
+          vendorName: "Unknown Vendor",
+          contractValue: "0",
+          startDate: "",
+          endDate: "",
+          status: "active",
+          vendorSignatureUrl: url,
+          vendorSignedAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        };
+
+        if (proposalSnap.exists()) {
+          const p = proposalSnap.data();
+          newContractPayload.title = p.proposalTitle || p.title || newContractPayload.title;
+          newContractPayload.vendorName = p.companyName || p.vendorName || newContractPayload.vendorName;
+          newContractPayload.contractValue = p.contractValue || newContractPayload.contractValue;
+          newContractPayload.startDate = p.startDate || newContractPayload.startDate;
+          newContractPayload.endDate = p.endDate || newContractPayload.endDate;
+          if (p.userId) newContractPayload.vendorUserId = p.userId;
+        }
+
+        if (proposalSnap && proposalSnap.exists()) {
+          const p = proposalSnap.data() as any;
+          if (p.proposalHargaUrl) newContractPayload.proposalHargaUrl = p.proposalHargaUrl;
+          if (p.companyDeedUrl) newContractPayload.companyDeedUrl = p.companyDeedUrl;
+          if (p.businessLicenseUrl) newContractPayload.businessLicenseUrl = p.businessLicenseUrl;
+          if (p.portfolioUrl) newContractPayload.portfolioUrl = p.portfolioUrl;
+        }
+
+        await setDoc(contractDoc, newContractPayload, { merge: true });
+        console.log("[dashboard] Created contract doc from proposal or minimal payload", contractId);
+      } catch (e) {
+        console.warn("[dashboard] Failed to create fallback contract doc:", e);
+
+        try {
+          const proposalDoc = doc(db, "proposals", contractId);
+          await updateDoc(proposalDoc, {
+            vendorSignatureUrl: url,
+            vendorSignedAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+          console.log("[dashboard] Updated proposal with vendor signature as fallback", contractId);
+        } catch (err) {
+          console.error("[dashboard] Error updating proposal fallback:", err);
+          throw err;
+        }
+      }
+    }
 
     console.log("[dashboard] Uploaded vendor signature and updated contract", contractId);
     return url;

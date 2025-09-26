@@ -8,6 +8,7 @@ import Sidebar from "../../components/Sidebar";
 import Footer from "../../components/Footer";
 import { colors } from "../../design-system";
 import DashboardHeader from "../../components/DashboardHeader";
+import DashboardContainer from "@/components/DashboardContainer";
 import { useAuth } from "../../context/AuthContext";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -68,7 +69,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           )}
 
           <div className="flex-1 md:pl-[260px]">
-            <div className="max-w-[1200px] mx-auto">{children}</div>
+            <DashboardContainer>
+              <div className="pt-6 md:pt-0">{children}</div>
+            </DashboardContainer>
           </div>
         </div>
       </main>

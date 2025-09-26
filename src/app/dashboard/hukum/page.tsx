@@ -6,6 +6,8 @@ import Spinner from "../../../components/Spinner";
 import { useAuth } from "../../../context/AuthContext";
 import { subscribeToProposals } from "@/services/proposals";
 import Link from "next/link";
+import DashboardContainer from "@/components/DashboardContainer";
+import DashboardCard from "@/components/DashboardCard";
 
 const HukumDashboard = () => {
   const { user, loading } = useAuth();
@@ -71,11 +73,11 @@ const HukumDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-6xl mx-auto">
+    <DashboardContainer>
+      <div className="pt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
-            <div key={index} className="rounded-lg p-6 shadow-sm" style={{ backgroundColor: "#ffffff" }}>
+            <DashboardCard key={index}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm mb-1" style={{ color: colors.base[600] }}>
@@ -94,13 +96,13 @@ const HukumDashboard = () => {
                   </svg>
                 </div>
               </div>
-            </div>
+            </DashboardCard>
           ))}
         </div>
 
-        <div className="rounded-lg shadow-sm mb-8" style={{ backgroundColor: "#ffffff" }}>
-          <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
-            <div className="flex items-center justify-between">
+        <DashboardCard className="mb-8">
+          <div className="p-0" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
+            <div className="flex items-center justify-between p-6">
               <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>
                 Pengajuan Terbaru
               </h2>
@@ -159,9 +161,9 @@ const HukumDashboard = () => {
               </div>
             ))}
           </div>
-        </div>
+        </DashboardCard>
 
-        <div className="rounded-lg shadow-sm" style={{ backgroundColor: "#ffffff" }}>
+        <DashboardCard>
           <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
             <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>
               Notifikasi & Pengingat
@@ -192,9 +194,9 @@ const HukumDashboard = () => {
               </div>
             ))}
           </div>
-        </div>
+        </DashboardCard>
       </div>
-    </div>
+    </DashboardContainer>
   );
 };
 

@@ -62,9 +62,19 @@ const SlaIcon = ({ className }: { className?: string }) => (
 // --- Main Component ---
 interface ContractStartedUIProps {
   contractId: string;
+  // optional lightweight contract summary passed from parent to avoid full-detail fetch failures
+  contractSummary?: {
+    id: string;
+    title?: string;
+    vendorName?: string;
+    contractValue?: string;
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+  } | null;
 }
 
-export default function ContractStartedUI({ contractId }: ContractStartedUIProps) {
+export default function ContractStartedUI({ contractId, contractSummary = null }: ContractStartedUIProps) {
   const [contractDetails, setContractDetails] = useState<ContractDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,6 +88,26 @@ export default function ContractStartedUI({ contractId }: ContractStartedUIProps
         const details = await getContractDetails(contractId);
         if (details) {
           setContractDetails(details);
+          setError(null);
+        } else if (contractSummary) {
+          // map lightweight summary into ContractDetails shape so UI can render
+          setContractDetails({
+            id: contractSummary.id,
+            title: contractSummary.title || "Untitled Contract",
+            vendorName: contractSummary.vendorName || "Unknown Vendor",
+            contractValue: contractSummary.contractValue || "0",
+            startDate: contractSummary.startDate || "",
+            endDate: contractSummary.endDate || "",
+            status: (contractSummary.status as any) || "pending",
+            createdAt: undefined,
+            deliverables: [],
+            milestones: [],
+            progress: 0,
+            slaRequirements: [],
+            technicalSpec: "",
+            paymentTerms: "",
+            notifications: [],
+          });
           setError(null);
         } else {
           setError("Contract not found");

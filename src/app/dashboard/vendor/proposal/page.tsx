@@ -8,6 +8,8 @@ import Spinner from "@/components/Spinner";
 import LineChart from "@/components/LineChart";
 import { ExclamationTriangleIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 import { subscribeToVendorData, Contract, Proposal, DashboardStats, Notification } from "@/services/dashboard";
+import DashboardContainer from "@/components/DashboardContainer";
+import DashboardCard from "@/components/DashboardCard";
 
 const ProposalPage = () => {
   const router = useRouter();
@@ -190,21 +192,21 @@ const ProposalPage = () => {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="p-6">
+    <DashboardContainer>
+      <div className="pt-6">
         {/* Linimasa Kontrak Chart */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>
             Linimasa Kontrak
           </h2>
         </div>
-        <div className="rounded-lg shadow-sm mb-8 p-6" style={{ backgroundColor: "#ffffff" }}>
+        <DashboardCard className="mb-8">
           <div className="text-sm" style={{ color: colors.base[600] }}>
             Tahun {new Date().getFullYear()}
           </div>
 
           <LineChart data={chartData} height={320} />
-        </div>
+        </DashboardCard>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Kontrak Aktif */}
@@ -383,7 +385,7 @@ const ProposalPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardContainer>
   );
 };
 
