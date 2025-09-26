@@ -39,7 +39,7 @@ export default function WhyChooseUs() {
                 style={{ backgroundColor: colors.base[100] }}
               >
                 <div className="w-12 h-12 rounded-md flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: colors.secondary[300] }}>
-                  <Icon size={20} color="white" aria-hidden />
+                  <img src={`/why-choose-us-${idx + 1}.png`} alt="check" className="w-full h-full object-cover" />
                 </div>
                 <h4 className="font-semibold mb-2" style={{ color: colors.base[700] }}>
                   {item.title}
