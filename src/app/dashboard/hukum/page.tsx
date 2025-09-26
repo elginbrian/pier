@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { colors } from "../../../design-system";
+import { colors } from "@/design-system";
 
 const HukumDashboard = () => {
   const stats = [

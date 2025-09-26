@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { MagnifyingGlassIcon, DocumentTextIcon, DocumentChartBarIcon, ArrowDownTrayIcon, ExclamationTriangleIcon, ClockIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { colors } from "../../../design-system";
+import { colors } from "@/design-system";
 
 export default function DashboardPage() {
   const router = useRouter();
