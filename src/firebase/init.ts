@@ -17,21 +17,22 @@ function assertFirebaseConfig(cfg: Record<string, any>) {
   const missing = Object.entries(cfg)
     .filter(([, v]) => !v)
     .map(([k]) => k);
-  if (missing.length) {
+  if (missing.length && typeof window !== "undefined") {
     console.warn(`[firebase] missing env vars: ${missing.join(", ")}. Set NEXT_PUBLIC_FIREBASE_* in your environment.`);
   }
 }
 
-assertFirebaseConfig(firebaseConfig);
+let app: any = null;
+let auth: any = null;
 
-function initFirebase() {
+if (typeof window !== "undefined") {
+  assertFirebaseConfig(firebaseConfig);
+
   if (!getApps().length) {
     initializeApp(firebaseConfig as any);
   }
-  return getApp();
+  app = getApp();
+  auth = getAuth(app);
 }
-
-const app = initFirebase();
-const auth = getAuth(app);
 
 export { app, auth };
