@@ -6,21 +6,15 @@ import { colors } from "@/design-system";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/Spinner";
 import { ExclamationTriangleIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
-import {
-  subscribeToVendorData,
-  Contract,
-  Proposal,
-  DashboardStats,
-  Notification
-} from "@/services/dashboard";
+import { subscribeToVendorData, Contract, Proposal, DashboardStats, Notification } from "@/services/dashboard";
 
 const ProposalPage = () => {
   const router = useRouter();
   const { user } = useAuth();
-  
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  
+
   // Firebase data states
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -28,16 +22,14 @@ const ProposalPage = () => {
     activeContracts: 0,
     pendingProposals: 0,
     expiringContracts: 0,
-    totalValue: 0
+    totalValue: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Filter proposals based on search term
-  const filteredProposals = proposals.filter(proposal =>
-    proposal.proposalTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    proposal.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    proposal.serviceType.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProposals = proposals.filter(
+    (proposal) => proposal.proposalTitle.toLowerCase().includes(searchTerm.toLowerCase()) || proposal.companyName.toLowerCase().includes(searchTerm.toLowerCase()) || proposal.serviceType.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination
@@ -60,7 +52,7 @@ const ProposalPage = () => {
         console.log("[proposals] Real-time data update:", {
           contracts: data.contracts.length,
           proposals: data.proposals.length,
-          stats: data.stats
+          stats: data.stats,
         });
 
         setContracts(data.contracts);
@@ -84,17 +76,17 @@ const ProposalPage = () => {
   const generateChartData = () => {
     const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
     const currentYear = new Date().getFullYear();
-    
-    return months.map(month => {
+
+    return months.map((month) => {
       // For demo purposes, we'll use some calculated data based on real stats
       // In a real app, you'd track historical data
       const activeCount = Math.floor(Math.random() * 50) + stats.activeContracts;
       const completedCount = Math.floor(Math.random() * 30) + 20;
-      
+
       return {
         month,
         aktif: activeCount,
-        selesai: completedCount
+        selesai: completedCount,
       };
     });
   };
@@ -102,9 +94,7 @@ const ProposalPage = () => {
   const chartData = generateChartData();
 
   // Filter active contracts from the contracts data
-  const activeContracts = contracts.filter(contract => 
-    contract.status === 'active' || contract.status === 'pending'
-  );
+  const activeContracts = contracts.filter((contract) => contract.status === "active" || contract.status === "pending");
 
   // Use real active contracts data
   const activeContractsData = activeContracts.slice(0, 3).map((contract: Contract) => ({
@@ -116,16 +106,22 @@ const ProposalPage = () => {
   }));
 
   // Contract table data - use real proposals data
-  const contractsData = paginatedProposals.map(proposal => ({
+  const contractsData = paginatedProposals.map((proposal) => ({
     id: proposal.id.substring(0, 6),
     name: proposal.proposalTitle,
     amount: proposal.contractValue || "Rp 0",
-    expiry: new Date(proposal.createdAt?.toDate?.() || proposal.createdAt).toLocaleDateString('id-ID'),
+    expiry: new Date(proposal.createdAt?.toDate?.() || proposal.createdAt).toLocaleDateString("id-ID"),
     type: proposal.serviceType,
-    status: proposal.status === 'pending' ? 'Draft' as const :
-           proposal.status === 'under_review' ? 'Diproses' as const :
-           proposal.status === 'approved' ? 'Selesai' as const :
-           proposal.status === 'rejected' ? 'Ditolak' as const : 'Draft' as const,
+    status:
+      proposal.status === "pending"
+        ? ("Draft" as const)
+        : proposal.status === "under_review"
+        ? ("Diproses" as const)
+        : proposal.status === "approved"
+        ? ("Selesai" as const)
+        : proposal.status === "rejected"
+        ? ("Ditolak" as const)
+        : ("Draft" as const),
   }));
 
   const getStatusBadge = (status: "Draft" | "Diproses" | "Ditolak" | "Selesai") => {
@@ -150,7 +146,7 @@ const ProposalPage = () => {
   };
 
   const handleCreateProposal = () => {
-    router.push('/dashboard/vendor/proposal/create');
+    router.push("/dashboard/vendor/proposal/create");
   };
 
   // Show loading state
@@ -166,9 +162,7 @@ const ProposalPage = () => {
   if (error) {
     return (
       <div className="min-h-screen p-6" style={{ backgroundColor: colors.base[100] }}>
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          Error loading proposal data: {error}
-        </div>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">Error loading proposal data: {error}</div>
       </div>
     );
   }
@@ -185,7 +179,7 @@ const ProposalPage = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.base[100] }}>
+    <div className="min-h-screen">
       <div className="p-6">
         {/* Linimasa Kontrak Chart */}
         <div className="rounded-lg shadow-sm mb-8 p-6" style={{ backgroundColor: "#ffffff" }}>

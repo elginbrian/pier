@@ -1,117 +1,75 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { colors } from "@/design-system";
+import Spinner from "../../../components/Spinner";
+import { useAuth } from "../../../context/AuthContext";
+import { subscribeToProposals } from "@/services/proposals";
+import Link from "next/link";
 
 const HukumDashboard = () => {
-  const stats = [
-    {
-      title: "Total Penggajian",
-      value: "247",
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke={colors.primary[600]}>
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeWidth="2" />
-          <polyline points="14,2 14,8 20,8" strokeWidth="2" />
-          <line x1="16" y1="13" x2="8" y2="13" strokeWidth="2" />
-          <line x1="16" y1="17" x2="8" y2="17" strokeWidth="2" />
-        </svg>
-      ),
-      bgColor: colors.primary[100],
-      textColor: colors.primary[600],
-    },
-    {
-      title: "Draft",
-      value: "18",
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke={colors.base[600]}>
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeWidth="2" />
-          <polyline points="14,2 14,8 20,8" strokeWidth="2" />
-        </svg>
-      ),
-      bgColor: colors.base[100],
-      textColor: colors.base[600],
-    },
-    {
-      title: "Review",
-      value: "10",
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke={colors.warning[600]}>
-          <circle cx="12" cy="12" r="10" strokeWidth="2" />
-          <polyline points="12,6 12,12 16,14" strokeWidth="2" />
-        </svg>
-      ),
-      bgColor: colors.warning[100],
-      textColor: colors.warning[600],
-    },
-    {
-      title: "Aktif",
-      value: "152",
-      icon: (
-        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke={colors.success[600]}>
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeWidth="2" />
-          <polyline points="22,4 12,14.01 9,11.01" strokeWidth="2" />
-        </svg>
-      ),
-      bgColor: colors.success[100],
-      textColor: colors.success[600],
-    },
-  ];
+  const { user, loading } = useAuth();
+  const [proposals, setProposals] = useState<any[]>([]);
 
-  const contracts = [
-    {
-      title: "Kontrak Layanan IT",
-      company: "PT Teknologi Maju",
-      date: "21.00 25 September 2025",
-      status: "Aktif",
-      statusColor: colors.success[100],
-      statusTextColor: colors.success[700],
-      iconBg: colors.primary[100],
-      iconColor: colors.primary[600],
-    },
-    {
-      title: "Kontrak Konstruksi Gudang",
-      company: "PT Bangun Jaya",
-      date: "16.00 25 September 2005",
-      status: "Review",
-      statusColor: colors.warning[100],
-      statusTextColor: colors.warning[700],
-      iconBg: colors.warning[100],
-      iconColor: colors.warning[600],
-    },
-    {
-      title: "Kontrak Pemeliharaan",
-      company: "PT Service Pro",
-      date: "13.00 25 September 2025",
-      status: "Draft",
-      statusColor: colors.base[100],
-      statusTextColor: colors.base[700],
-      iconBg: colors.base[100],
-      iconColor: colors.base[600],
-    },
-  ];
+  useEffect(() => {
+    if (loading) return;
+    if (!user || user.role !== "hukum") return;
 
-  const notifications = [
-    {
-      title: "Perlu revisi pada beberapa bagian klausul",
-      description: "Kontrak Layanan Kebersihan dengan PT Clean Service",
-      dotColor: colors.error[500],
-    },
-    {
-      title: "Review hukum menunggu persetujuan",
-      description: "3 dokumen kontrak menunggu review dari tim hukum",
-      dotColor: colors.warning[500],
-    },
-    {
-      title: "Revisi telah disetujui",
-      description: "Perubahan yang diminta telah disetujui oleh PT Merdeka Jaya",
-      dotColor: colors.success[500],
-    },
-    {
-      title: "Review hukum menunggu persetujuan",
-      description: "3 dokumen kontrak menunggu review dari tim hukum",
-      dotColor: colors.warning[500],
-    },
-  ];
+    const unsubscribe = subscribeToProposals((items) => {
+      setProposals(items as any[]);
+    });
+
+    return () => unsubscribe && unsubscribe();
+  }, [user, loading]);
+
+  const stats = useMemo(() => {
+    const total = proposals.length;
+    const draft = proposals.filter((p) => p.status === "draft" || p.status === "pending").length;
+    const review = proposals.filter((p) => p.status === "under_review").length;
+    const active = proposals.filter((p) => p.status === "approved" || p.status === "active").length;
+
+    return [
+      { title: "Total Pengajuan", value: String(total), bgColor: colors.primary[100], iconColor: colors.primary[600] },
+      { title: "Draft/Pending", value: String(draft), bgColor: colors.base[100], iconColor: colors.base[600] },
+      { title: "In Review", value: String(review), bgColor: colors.warning[100], iconColor: colors.warning[600] },
+      { title: "Disetujui/Aktif", value: String(active), bgColor: colors.success[100], iconColor: colors.success[600] },
+    ];
+  }, [proposals]);
+
+  const latest = proposals.slice(0, 6);
+
+  const notifications = useMemo(() => {
+    // Create simple notifications based on statuses
+    const notes: any[] = [];
+    const waiting = proposals.filter((p) => p.status === "pending" || p.status === "under_review");
+    if (waiting.length > 0) {
+      notes.push({ title: `${waiting.length} pengajuan menunggu tindakan`, description: "Periksa pengajuan terbaru dan lakukan review.", dotColor: colors.warning[500] });
+    }
+
+    const rejected = proposals.filter((p) => p.status === "rejected");
+    if (rejected.length > 0) {
+      notes.push({ title: `${rejected.length} pengajuan ditolak`, description: "Beberapa pengajuan ditolak. Lihat detail untuk komentar.", dotColor: colors.error[500] });
+    }
+
+    const approved = proposals.filter((p) => p.status === "approved" || p.status === "active");
+    if (approved.length > 0) {
+      notes.push({ title: `${approved.length} pengajuan disetujui`, description: "Pengajuan yang disetujui telah diproses.", dotColor: colors.success[500] });
+    }
+
+    return notes;
+  }, [proposals]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spinner size={48} />
+      </div>
+    );
+  }
+
+  if (!user || user.role !== "hukum") {
+    return null;
+  }
 
   return (
     <div className="min-h-screen p-6">
@@ -130,57 +88,77 @@ const HukumDashboard = () => {
                   </p>
                 </div>
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: stat.bgColor }}>
-                  {stat.icon}
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke={stat.iconColor}>
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeWidth="2" />
+                    <polyline points="14,2 14,8 20,8" strokeWidth="2" />
+                    <line x1="16" y1="13" x2="8" y2="13" strokeWidth="2" />
+                    <line x1="16" y1="17" x2="8" y2="17" strokeWidth="2" />
+                  </svg>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Status Penggajian Terbaru */}
+        {/* Latest Proposals */}
         <div className="rounded-lg shadow-sm mb-8" style={{ backgroundColor: "#ffffff" }}>
           <div className="p-6" style={{ borderBottom: `1px solid ${colors.base[200]}` }}>
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold" style={{ color: colors.base[700] }}>
-                Status Penggajian Terbaru
+                Pengajuan Terbaru
               </h2>
-              <button className="text-sm font-medium hover:underline" style={{ color: colors.primary[600] }}>
+              <Link href="/dashboard/hukum/detail-pengajuan" className="text-sm font-medium hover:underline" style={{ color: colors.primary[600] }}>
                 Lihat Semua
-              </button>
+              </Link>
             </div>
           </div>
 
           <div style={{ borderTop: `1px solid ${colors.base[200]}` }}>
-            {contracts.map((contract, index) => (
-              <div key={index}>
+            {latest.length === 0 && (
+              <div className="p-6 text-sm" style={{ color: colors.base[600] }}>
+                Belum ada pengajuan.
+              </div>
+            )}
+
+            {latest.map((p, index) => (
+              <div key={p.id || index}>
                 <div className="p-6 flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: contract.iconBg }}>
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke={contract.iconColor}>
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: colors.primary[100] }}>
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke={colors.primary[600]}>
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeWidth="2" />
                         <polyline points="14,2 14,8 20,8" strokeWidth="2" />
                       </svg>
                     </div>
                     <div>
                       <h3 className="font-medium" style={{ color: colors.base[700] }}>
-                        {contract.title}
+                        <Link href={`/dashboard/hukum/detail-pengajuan/${p.id}`} className="hover:underline">
+                          {p.proposalTitle || p.proposal_title || "-"}
+                        </Link>
                       </h3>
                       <p className="text-sm" style={{ color: colors.base[600] }}>
-                        {contract.company} - {contract.date}
+                        {p.companyName || p.company_name || "-"} - {p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleString() : "-"}
                       </p>
                     </div>
                   </div>
-                  <span
-                    className="px-3 py-1 text-xs font-medium rounded-full"
-                    style={{
-                      backgroundColor: contract.statusColor,
-                      color: contract.statusTextColor,
-                    }}
-                  >
-                    {contract.status}
-                  </span>
+
+                  <div className="flex items-center space-x-3">
+                    <span
+                      className="px-3 py-1 text-xs font-medium rounded-full"
+                      style={{
+                        backgroundColor: p.status === "approved" || p.status === "active" ? colors.success[100] : p.status === "rejected" ? colors.error[100] : colors.warning[100],
+                        color: p.status === "approved" || p.status === "active" ? colors.success[700] : p.status === "rejected" ? colors.error[700] : colors.warning[700],
+                      }}
+                    >
+                      {p.status}
+                    </span>
+
+                    <Link href={`/dashboard/hukum/detail-pengajuan/${p.id}`} className="text-sm font-medium hover:underline" style={{ color: colors.primary[600] }}>
+                      Detail
+                    </Link>
+                  </div>
                 </div>
-                {index < contracts.length - 1 && <div style={{ borderTop: `1px solid ${colors.base[200]}` }}></div>}
+                {index < latest.length - 1 && <div style={{ borderTop: `1px solid ${colors.base[200]}` }}></div>}
               </div>
             ))}
           </div>
@@ -195,6 +173,12 @@ const HukumDashboard = () => {
           </div>
 
           <div>
+            {notifications.length === 0 && (
+              <div className="p-6 text-sm" style={{ color: colors.base[600] }}>
+                Tidak ada notifikasi.
+              </div>
+            )}
+
             {notifications.map((notification, index) => (
               <div key={index}>
                 <div className="p-6 flex items-start space-x-4">
