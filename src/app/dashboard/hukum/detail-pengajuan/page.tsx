@@ -182,17 +182,19 @@ const DetailPengajuanPage = () => {
                     </td>
                     <td className="py-4 px-6">{getStatusBadge(p.status)}</td>
                     <td className="py-4 px-6">
-                      <div className="flex items-center gap-2">
-                        <button title="Mark Review" disabled={busyId === p.id} onClick={() => handleSetStatus(p.id, "under_review")} className="p-2 rounded" style={{ backgroundColor: colors.info[100], color: colors.info[700] }}>
-                          {busyId === p.id && p.status === "under_review" ? "..." : <FiClock size={16} />}
-                        </button>
-                        <button title="Approve" disabled={busyId === p.id} onClick={() => handleSetStatus(p.id, "approved")} className="p-2 rounded" style={{ backgroundColor: colors.success[100], color: colors.success[700] }}>
-                          {busyId === p.id && p.status === "approved" ? "..." : <FiCheck size={16} />}
-                        </button>
-                        <button title="Reject" disabled={busyId === p.id} onClick={() => setConfirmReject({ id: p.id, open: true })} className="p-2 rounded" style={{ backgroundColor: colors.error[100], color: colors.error[700] }}>
-                          <FiX size={16} />
-                        </button>
-                      </div>
+                      {p.status !== "approved" && (
+                        <div className="flex items-center gap-2">
+                          <button title="Mark Review" disabled={busyId === p.id} onClick={() => handleSetStatus(p.id, "under_review")} className="p-2 rounded" style={{ backgroundColor: colors.info[100], color: colors.info[700] }}>
+                            {busyId === p.id && p.status === "under_review" ? "..." : <FiClock size={16} />}
+                          </button>
+                          <button title="Approve" disabled={busyId === p.id} onClick={() => handleSetStatus(p.id, "approved")} className="p-2 rounded" style={{ backgroundColor: colors.success[100], color: colors.success[700] }}>
+                            {busyId === p.id && p.status === "approved" ? "..." : <FiCheck size={16} />}
+                          </button>
+                          <button title="Reject" disabled={busyId === p.id} onClick={() => setConfirmReject({ id: p.id, open: true })} className="p-2 rounded" style={{ backgroundColor: colors.error[100], color: colors.error[700] }}>
+                            <FiX size={16} />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
