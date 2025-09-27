@@ -52,19 +52,19 @@ export const DOCUMENT_PREVIEWS = [
   {
     title: "Application letter for selected business actors",
     filename: "surat-permohonan-pelaku-usaha-terseleksi.docx",
-    preview: "Application letter preview",
+    preview: "/surat1.png",
     downloadUrl: "https://firebasestorage.googleapis.com/v0/b/pier-pelindo.firebasestorage.app/o/templates%2Fsurat-permohonan-pelaku-usaha-terseleksi.docx?alt=media&token=2fff5956-ae72-4c4e-9889-e6dbfbe4631d",
   },
   {
     title: "Integrity pact",
     filename: "pakta-integritas.docx",
-    preview: "Integrity pact preview",
+    preview: "/surat2.png",
     downloadUrl: "https://firebasestorage.googleapis.com/v0/b/pier-pelindo.firebasestorage.app/o/templates%2Fpakta-integritas.docx?alt=media&token=6955676d-39e3-4d37-a451-fa15c6195eeb",
   },
   {
     title: "Statement Letter and Committee as Partners in the PT ILCS Area",
     filename: "surat-pernyataan-dan-komiten-sebagai-mitra-di-wilayah-pt-integrasi-logistik-cipta-solusi.docx",
-    preview: "Statement letter preview",
+    preview: "/surat3.png",
     downloadUrl: "https://firebasestorage.googleapis.com/v0/b/pier-pelindo.firebasestorage.app/o/templates%2Fsurat-pernyataan-dan-komiten-sebagai-mitra-di-wilayah-pt-integrasi-logistik-cipta-solusi.docx?alt=media&token=c4de9e3e-9766-4d64-8d09-cf37d8793eed",
   },
 ];
