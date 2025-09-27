@@ -50,8 +50,8 @@ export default function ContractReviewPage() {
   const statusMapping = {
     pending: { step: 0, declined: false },
     under_review: { step: 1, declined: false },
-    approved: { step: 3, declined: false },
-    active: { step: 4, declined: false },
+    approved: { step: 2, declined: false },
+    active: { step: 3, declined: false },
     expired: { step: 5, declined: false },
     terminated: { step: 2, declined: true },
     rejected: { step: 2, declined: true },
