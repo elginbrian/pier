@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { getContractDetails, ContractDetails, markContractComplete } from "@/services/dashboard";
 
@@ -34,29 +36,12 @@ const BellIcon = ({ className }: { className?: string }) => (
 );
 
 const DocumentIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/upload-pdf-file.svg"
-    alt="Management File"
-    className={`w-8 h-8 rounded-lg object-contain ${className || ""}`}
-    style={{ filter: "invert(32%) sepia(98%) saturate(749%) hue-rotate(185deg) brightness(98%) contrast(101%)" }}
-  />
+  <img src="/upload-pdf-file.svg" alt="Management File" className={`w-8 h-8 rounded-lg object-contain ${className || ""}`} style={{ filter: "invert(32%) sepia(98%) saturate(749%) hue-rotate(185deg) brightness(98%) contrast(101%)" }} />
 );
 
-const MilestoneIcon = () => (
-  <img
-    src="/milestone.svg"
-    alt="Milestone"
-    className="w-8 h-8 rounded-lg object-contain"
-  />
-);
+const MilestoneIcon = () => <img src="/milestone.svg" alt="Milestone" className="w-8 h-8 rounded-lg object-contain" />;
 
-const SlaIcon = () => (
-  <img
-    src="/monitoring.svg"
-    alt="Monitoring"
-    className="w-8 h-8 rounded-lg object-contain"
-  />
-);
+const SlaIcon = () => <img src="/monitoring.svg" alt="Monitoring" className="w-8 h-8 rounded-lg object-contain" />;
 
 // --- Main Component ---
 interface ContractStartedUIProps {
@@ -260,19 +245,7 @@ export default function ContractStartedUI({ contractId, contractSummary = null }
           <div className="space-y-4">
             {quickActions.map((action, index) => (
               <div key={index} className="hover:bg-slate-50 transition-colors duration-200 rounded-xl p-4 flex items-center cursor-pointer border border-slate-200">
-                <div
-                  className={`p-3 rounded-lg mr-4 border border-slate-100 ${
-                    index === 0
-                      ? "bg-blue-50"
-                      : index === 1
-                      ? "bg-orange-50"
-                      : index === 2
-                      ? "bg-green-50"
-                      : "bg-white"
-                  }`}
-                >
-                  {action.icon}
-                </div>
+                <div className={`p-3 rounded-lg mr-4 border border-slate-100 ${index === 0 ? "bg-blue-50" : index === 1 ? "bg-orange-50" : index === 2 ? "bg-green-50" : "bg-white"}`}>{action.icon}</div>
                 <div>
                   <p className="font-semibold text-slate-800">{action.title}</p>
                   <p className="text-sm text-slate-600">{action.subtitle}</p>
