@@ -68,7 +68,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           )}
 
-          <div className="flex-1 w-full">
+          <div className="flex-1 md:pl-[260px]">
             <DashboardContainer>
               <div className="pt-6 md:pt-0">{children}</div>
             </DashboardContainer>
