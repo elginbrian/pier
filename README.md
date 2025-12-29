@@ -3,13 +3,14 @@
 # PIER - Pelindo Integrated Electronic Repository
 
 ![PIER Logo](public/pelindo-plain.png)
-![PIER Presentation](https://github.com/elginbrian/pier-pelindo/blob/main/pier.png)
 
 **AI-Powered Contract Management Platform for PT ILCS (Pelindo Group)**
 
 </div>
 
 ---
+
+![PIER Presentation](https://github.com/elginbrian/pier-pelindo/blob/main/pier.png)
 
 ## 🎯 Overview
 
